@@ -461,7 +461,7 @@ const Budget = () => {
   const { budgets, getBudgets, deleteBudget } = useContext(AppContent);
   const [filter, setFilter] = useState("all");
   const [showFormOverlay, setShowFormOverlay] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -487,17 +487,24 @@ const Budget = () => {
     getBudgets();
   }, []);
 
-  const handleFormSubmit = async () => {
-    setIsSubmitting(true);
+  // Separate function to refresh budgets in background
+  const refreshBudgets = async () => {
+    setIsRefreshing(true);
     try {
       await getBudgets();
-
-      setShowFormOverlay(false);
     } catch (error) {
       console.error("Error refreshing budgets:", error);
     } finally {
-      setIsSubmitting(false);
+      setIsRefreshing(false);
     }
+  };
+
+  const handleFormSubmit = () => {
+    // Close the overlay IMMEDIATELY
+    setShowFormOverlay(false);
+
+    // Refresh budgets in the background
+    refreshBudgets();
   };
 
   const handleFilterChange = (e) => {
@@ -512,7 +519,8 @@ const Budget = () => {
 
   return (
     <BudgetStyled>
-      <h1>Monthly Budgets</h1>
+      <h1>Monthly Budgets {isRefreshing && "🔄"}</h1>
+
       <div className="total-budget">
         Total Budget:{" "}
         <span>
@@ -525,17 +533,12 @@ const Budget = () => {
         <button
           className="desktop-add-btn"
           onClick={() => setShowFormOverlay(true)}
-          disabled={isSubmitting}
         >
           Set Budget
         </button>
 
         <div className="filter-select">
-          <select
-            value={filter}
-            onChange={handleFilterChange}
-            disabled={isSubmitting}
-          >
+          <select value={filter} onChange={handleFilterChange}>
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
@@ -550,7 +553,6 @@ const Budget = () => {
         className="mobile-add-btn"
         onClick={() => setShowFormOverlay(true)}
         title="Set New Budget"
-        disabled={isSubmitting}
       >
         Set
         <br />
@@ -564,7 +566,6 @@ const Budget = () => {
               className="close-btn"
               onClick={() => setShowFormOverlay(false)}
               aria-label="Close form"
-              disabled={isSubmitting}
             >
               ×
             </button>
@@ -574,6 +575,13 @@ const Budget = () => {
       )}
 
       <div className="budget-content">
+        {isRefreshing && (
+          <div
+            style={{ textAlign: "center", padding: "1rem", color: "#1abc9c" }}
+          >
+            Refreshing budgets...
+          </div>
+        )}
         <div className="budget-list">
           {filteredBudgets.length === 0 ? (
             <p className="empty-message">
@@ -615,6 +623,7 @@ export default Budget;
 //   const { budgets, getBudgets, deleteBudget } = useContext(AppContent);
 //   const [filter, setFilter] = useState("all");
 //   const [showFormOverlay, setShowFormOverlay] = useState(false);
+//   const [isSubmitting, setIsSubmitting] = useState(false);
 
 //   const categories = [
 //     { value: "all", label: "All Categories" },
@@ -640,12 +649,27 @@ export default Budget;
 //     getBudgets();
 //   }, []);
 
-//   const handleFormSubmit = () => {
-//     setShowFormOverlay(false);
+//   const handleFormSubmit = async () => {
+//     setIsSubmitting(true);
+//     try {
+//       await getBudgets();
+
+//       setShowFormOverlay(false);
+//     } catch (error) {
+//       console.error("Error refreshing budgets:", error);
+//     } finally {
+//       setIsSubmitting(false);
+//     }
 //   };
 
 //   const handleFilterChange = (e) => {
 //     setFilter(e.target.value);
+//   };
+
+//   const handleOverlayClick = (e) => {
+//     if (e.target.className === "form-overlay") {
+//       setShowFormOverlay(false);
+//     }
 //   };
 
 //   return (
@@ -663,12 +687,17 @@ export default Budget;
 //         <button
 //           className="desktop-add-btn"
 //           onClick={() => setShowFormOverlay(true)}
+//           disabled={isSubmitting}
 //         >
 //           Set Budget
 //         </button>
 
 //         <div className="filter-select">
-//           <select value={filter} onChange={handleFilterChange}>
+//           <select
+//             value={filter}
+//             onChange={handleFilterChange}
+//             disabled={isSubmitting}
+//           >
 //             {categories.map((cat) => (
 //               <option key={cat.value} value={cat.value}>
 //                 {cat.label}
@@ -683,6 +712,7 @@ export default Budget;
 //         className="mobile-add-btn"
 //         onClick={() => setShowFormOverlay(true)}
 //         title="Set New Budget"
+//         disabled={isSubmitting}
 //       >
 //         Set
 //         <br />
@@ -690,12 +720,13 @@ export default Budget;
 //       </button>
 
 //       {showFormOverlay && (
-//         <div className="form-overlay">
+//         <div className="form-overlay" onClick={handleOverlayClick}>
 //           <div className="form-container">
 //             <button
 //               className="close-btn"
 //               onClick={() => setShowFormOverlay(false)}
 //               aria-label="Close form"
+//               disabled={isSubmitting}
 //             >
 //               ×
 //             </button>

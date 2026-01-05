@@ -204,6 +204,8 @@ const BudgetForm = ({ onBudgetSaved }) => {
             onChange={(e) => setAmount(e.target.value)}
             required
             disabled={loading}
+            min="0"
+            step="1"
           />
         </FormGroup>
 
@@ -218,8 +220,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
 export default BudgetForm;
 
 // const BudgetForm = ({ onBudgetSaved }) => {
-//   const { backendUrl, getUserData, addBudget, categories } =
-//     useContext(AppContent);
+//   const { addBudget } = useContext(AppContent);
 
 //   const [month, setMonth] = useState("");
 //   const [title, setTitle] = useState("");
@@ -258,11 +259,16 @@ export default BudgetForm;
 //       setTitle("");
 //       setCategory("");
 //       setAmount("");
-//       if (onBudgetSaved) onBudgetSaved();
+//       if (onBudgetSaved) {
+//         onBudgetSaved();
+//       }
+//     } catch (error) {
+//       toast.error("Failed to save budget. Please try again.");
 //     } finally {
 //       setLoading(false);
 //     }
 //   };
+
 //   return (
 //     <FormContainer>
 //       <FormTitle>Add New Budget</FormTitle>
@@ -275,6 +281,7 @@ export default BudgetForm;
 //             value={month}
 //             onChange={(e) => setMonth(e.target.value)}
 //             required
+//             disabled={loading}
 //           >
 //             <option value="">-- Select Month --</option>
 //             {months.map((m, index) => (
@@ -294,6 +301,7 @@ export default BudgetForm;
 //             value={title}
 //             onChange={(e) => setTitle(e.target.value)}
 //             required
+//             disabled={loading}
 //           />
 //         </FormGroup>
 
@@ -304,6 +312,7 @@ export default BudgetForm;
 //             value={category}
 //             onChange={(e) => setCategory(e.target.value)}
 //             required
+//             disabled={loading}
 //           >
 //             <option value="">-- Select Category --</option>
 //             <option value="food">Food</option>
@@ -326,6 +335,7 @@ export default BudgetForm;
 //             value={amount}
 //             onChange={(e) => setAmount(e.target.value)}
 //             required
+//             disabled={loading}
 //           />
 //         </FormGroup>
 
