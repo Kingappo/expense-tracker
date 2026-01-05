@@ -13,10 +13,6 @@ export const AppContextProvider = (props) => {
   const [expenses, setExpenses] = useState([]);
   const [budgets, setBudgets] = useState([]);
 
-  const [adminUsers, setAdminUsers] = useState([]);
-  const [adminStats, setAdminStats] = useState(null);
-  const [adminDeletedUsers, setAdminDeletedUsers] = useState([]);
-
   const getAuthState = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/auth/is-auth");
@@ -39,111 +35,6 @@ export const AppContextProvider = (props) => {
       data.success ? setUserData(data.userData) : toast.error(data.message);
     } catch (error) {
       toast.error(error.message);
-    }
-  };
-
-  const checkAdminStatus = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/auth/check-admin");
-      return data.isAdmin;
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-      return false;
-    }
-  };
-
-  const fetchAdminUsers = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/admin/users");
-      if (data.success) {
-        setAdminUsers(data.users);
-      }
-    } catch (error) {
-      console.error("Error fetching admin users:", error);
-    }
-  };
-
-  const fetchAdminStats = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/admin/stats");
-      if (data.success) {
-        setAdminStats(data);
-      }
-    } catch (error) {
-      console.error("Error fetching admin stats:", error);
-    }
-  };
-
-  const fetchDeletedUsers = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/admin/users/deleted");
-      if (data.success) {
-        setAdminDeletedUsers(data.deletedUsers);
-      }
-    } catch (error) {
-      console.error("Error fetching deleted users:", error);
-    }
-  };
-
-  const toggleUserStatus = async (userId, action) => {
-    try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/admin/users/${userId}/status`,
-        { action }
-      );
-
-      if (data.success) {
-        toast.success(data.message);
-        fetchAdminUsers();
-        fetchDeletedUsers();
-        return true;
-      } else {
-        toast.error(data.message);
-        return false;
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return false;
-    }
-  };
-
-  const promoteToAdmin = async (userId) => {
-    try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/admin/users/${userId}/make-admin`
-      );
-
-      if (data.success) {
-        toast.success(data.message);
-        fetchAdminUsers();
-        return true;
-      } else {
-        toast.error(data.message);
-        return false;
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return false;
-    }
-  };
-
-  const removeAdminRole = async (userId) => {
-    try {
-      const { data } = await axios.patch(
-        `${backendUrl}/api/admin/users/${userId}/remove-admin`
-      );
-
-      if (data.success) {
-        toast.success(data.message);
-        fetchAdminUsers();
-        return true;
-      } else {
-        toast.error(data.message);
-        return false;
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return false;
     }
   };
 
@@ -276,25 +167,6 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
-  const budgetProgress = (category, month) => {
-    if (!budgets.length || !expenses.length) return 0;
-    const b = budgets.find(
-      (x) =>
-        x.category?.toLowerCase() === category?.toLowerCase() &&
-        x.month?.toLowerCase() === month?.toLowerCase()
-    );
-    if (!b) return 0;
-    const spent = expenses
-      .filter(
-        (exp) =>
-          exp.category?.toLowerCase() === category?.toLowerCase() &&
-          exp.month?.toLowerCase() === month?.toLowerCase()
-      )
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    const percent = Math.round((spent / b.amount) * 100);
-    return percent > 100 ? 100 : percent;
-  };
   const totalIncome = () => {
     let total = 0;
     incomes.forEach((income) => {
@@ -334,17 +206,6 @@ export const AppContextProvider = (props) => {
     userData,
     setUserData,
     getUserData,
-    checkAdminStatus,
-
-    adminUsers,
-    adminStats,
-    adminDeletedUsers,
-    fetchAdminUsers,
-    fetchAdminStats,
-    fetchDeletedUsers,
-    toggleUserStatus,
-    promoteToAdmin,
-    removeAdminRole,
     addIncome,
     incomes,
     getIncomes,
@@ -357,7 +218,6 @@ export const AppContextProvider = (props) => {
     getBudgets,
     addBudget,
     deleteBudget,
-    budgetProgress,
     totalIncome,
     totalExpense,
     balance,
