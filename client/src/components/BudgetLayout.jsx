@@ -468,6 +468,8 @@ const Budget = () => {
     { value: "health", label: "Health" },
     { value: "transport", label: "Transport" },
     { value: "rent", label: "Rent" },
+    { value: "airtime", label: "Airtime" },
+    { value: "data", label: "Data" },
     { value: "school", label: "School" },
     { value: "other", label: "Other" },
   ];

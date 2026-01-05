@@ -363,7 +363,10 @@ const TopNavbar = () => {
       </div>
 
       {userData && isLoggedin && (
-        <div className="user-info-mobile">
+        <div
+          onClick={() => navigation("/account")}
+          className="user-info-mobile"
+        >
           <div className="user-avatar">
             {userData.firstName?.[0]?.toUpperCase() || "U"}
           </div>

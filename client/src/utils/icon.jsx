@@ -36,5 +36,6 @@ export const reciept = <i class="fa-solid fa-receipt"></i>;
 export const business = <i class="fa-solid fa-briefcase"></i>;
 export const notification = <i class="fa-solid fa-bell"></i>;
 export const budget = <i class="fa-solid fa-envelope-circle-check"></i>;
-export const hidep = <i class="fa-regular fa-eye"></i>;
-export const showp = <i class="fa-regular fa-eye-slash"></i>;
+export const gift = <i class="fa-solid fa-gift"></i>;
+export const airtime = <i class="fa-solid fa-mobile-vibrate"></i>;
+export const data = <i class="fa-solid fa-signal"></i>;

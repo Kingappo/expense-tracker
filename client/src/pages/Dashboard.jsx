@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import Chart from "../components/Chart";
 import { InnerLayOut } from "../styles/Layout";
@@ -54,10 +54,6 @@ const DashboardStyled = styled.div`
   .trans-navigate {
     position: relative;
 
-    &:hover .dropdown {
-      display: block;
-    }
-
     .trans-options {
       display: flex;
       align-items: center;
@@ -88,8 +84,9 @@ const DashboardStyled = styled.div`
       list-style: none;
       padding: 0.5rem 0;
       min-width: 180px;
-      display: none;
+      display: ${(props) => (props.showDropdown ? "block" : "none")};
       z-index: 1002;
+      animation: fadeIn 0.2s ease;
 
       li {
         padding: 0.5rem 1rem;
@@ -106,6 +103,17 @@ const DashboardStyled = styled.div`
     }
   }
 
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .stats-con {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -119,7 +127,7 @@ const DashboardStyled = styled.div`
     min-height: 300px;
     position: relative;
     width: 100%;
-    overflow: hidden; // Add this
+    overflow: hidden;
   }
 
   .history-con {
@@ -406,29 +414,47 @@ const DashboardStyled = styled.div`
       }
     }
   }
-
-  @media (hover: none) and (pointer: coarse) {
-    .trans-navigate .dropdown {
-      display: none !important;
-    }
-
-    .trans-navigate:active .dropdown,
-    .trans-navigate:focus .dropdown {
-      display: block !important;
-    }
-
-    .income:hover,
-    .expense:hover,
-    .balance:hover {
-      transform: none;
-    }
-  }
 `;
+
 function Dashboard() {
   const navigation = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const { totalIncome, totalExpense, balance } = useContext(AppContent);
   const [isDownloading, setIsDownloading] = React.useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleOptionClick = (path) => {
+    navigation(path);
+    setShowDropdown(false);
+  };
+
   const generateReport = async () => {
     const element = document.getElementById("report-content");
 
@@ -459,17 +485,26 @@ function Dashboard() {
       setIsDownloading(false);
     }
   };
+
   return (
-    <DashboardStyled>
+    <DashboardStyled showDropdown={showDropdown}>
       <InnerLayOut>
         <div className="report">
-          <h1>All Transactions</h1>
-          <div className="trans-navigate">
-            <h4 className="trans-options">Select Transaction</h4>
+          <h1>Dashboard</h1>
+          <div className="trans-navigate" ref={dropdownRef}>
+            <h4
+              className="trans-options"
+              onClick={toggleDropdown}
+              ref={buttonRef}
+            >
+              Select Transaction
+            </h4>
             <ul className="dropdown">
-              <li onClick={() => navigation("/income")}>Add Income</li>
-              <li onClick={() => navigation("/expenses")}>Add Expense</li>
-              <li onClick={() => navigation("/budget")}>Add Budget</li>
+              <li onClick={() => handleOptionClick("/income")}>Add Income</li>
+              <li onClick={() => handleOptionClick("/expenses")}>
+                Add Expense
+              </li>
+              <li onClick={() => handleOptionClick("/budget")}>Add Budget</li>
             </ul>
           </div>
           <button onClick={generateReport} disabled={isDownloading}>

@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import Swal from "sweetalert2";
 import {
+  airtime,
+  data,
   food,
   medical,
   naira,
@@ -268,7 +270,6 @@ const BudgetItem = ({
   showDelete = true,
   isMainHistory = false,
 }) => {
-  // Determine icon for expense categories
   const expenseCategory = () => {
     switch (category) {
       case "food":
@@ -279,6 +280,10 @@ const BudgetItem = ({
         return medical;
       case "rent":
         return rent;
+      case "airtime":
+        return airtime;
+      case "data":
+        return data;
       case "school":
         return school;
       case "other":
@@ -288,7 +293,6 @@ const BudgetItem = ({
     }
   };
 
-  // 🔥 Delete confirmation with SweetAlert2
   const handleDelete = () => {
     Swal.fire({
       title: "Are you sure?",

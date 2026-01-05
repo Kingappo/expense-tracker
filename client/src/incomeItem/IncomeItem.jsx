@@ -2,12 +2,15 @@ import React from "react";
 import styled from "styled-components";
 import Swal from "sweetalert2";
 import {
+  airtime,
   business,
   calender,
   comment,
+  data,
   farming,
   food,
   freelance,
+  gift,
   medical,
   money,
   naira,
@@ -337,6 +340,8 @@ const IncomeItem = ({
         return farming;
       case "business":
         return business;
+      case "gift":
+        return gift;
       case "others":
         return piggy;
       default:
@@ -356,6 +361,10 @@ const IncomeItem = ({
         return rent;
       case "school":
         return school;
+      case "airtime":
+        return airtime;
+      case "data":
+        return data;
       case "other":
         return piggy;
       default:

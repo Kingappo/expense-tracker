@@ -298,7 +298,7 @@ const ViewHistory = () => {
       <InnerLayOut>
         <div className="history-con">
           <div className="filter-con">
-            <h2>Transactions</h2>
+            <h2>Transaction Histories</h2>
             <div className="filters">
               <FilterOption
                 value="all"

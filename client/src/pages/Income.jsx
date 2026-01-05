@@ -492,6 +492,7 @@ const Income = () => {
     { value: "freelancing", label: "Freelancing" },
     { value: "investment", label: "Investment" },
     { value: "business", label: "Business" },
+    { value: "gift", label: "Gift" },
     { value: "farming", label: "Farming" },
     { value: "others", label: "Others" },
   ];

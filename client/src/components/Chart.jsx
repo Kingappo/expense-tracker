@@ -12,7 +12,7 @@ import {
 import { Line } from "react-chartjs-2";
 import styled from "styled-components";
 import { AppContent } from "../context/AppContext";
-import { dateFormat } from "../utils/dateFormat";
+import { dateFormat, formatForChart } from "../utils/dateFormat";
 
 Chartjs.register(
   CategoryScale,
@@ -81,7 +81,6 @@ const Chart = () => {
 
     window.addEventListener("resize", handleResize);
 
-    // Set chart as ready after a short delay to ensure container is rendered
     const timer = setTimeout(() => {
       setIsChartReady(true);
     }, 100);
@@ -103,10 +102,15 @@ const Chart = () => {
   // Calculate date range for last 7 days
   const getLast7Days = () => {
     const dates = [];
+    const today = new Date();
+
     for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      dates.push(dateFormat(date));
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      date.setHours(12, 0, 0, 0);
+
+      const formattedDate = formatForChart(date);
+      dates.push(formattedDate);
     }
     return dates;
   };
@@ -115,16 +119,70 @@ const Chart = () => {
   const filterLast7DaysData = useMemo(() => {
     const last7Days = getLast7Days();
 
-    // Filter incomes from the last 7 days
+    // Filter incomes
     const filteredIncomes = incomes.filter((income) => {
-      const incomeDate = dateFormat(income.date);
-      return last7Days.includes(incomeDate);
+      try {
+        const incomeDate = formatForChart(income.date);
+        const isValidDate =
+          incomeDate !== "N/A" &&
+          incomeDate !== "Invalid Date" &&
+          incomeDate !== "Error";
+
+        if (!isValidDate) {
+          console.warn(
+            "Invalid income date skipped:",
+            income.date,
+            "->",
+            incomeDate
+          );
+          return false;
+        }
+
+        const isInRange = last7Days.includes(incomeDate);
+
+        return isInRange;
+      } catch (error) {
+        console.warn("Error processing income date:", income.date, error);
+        return false;
+      }
     });
 
-    // Filter expenses from the last 7 days
+    // Filter expenses
     const filteredExpenses = expenses.filter((expense) => {
-      const expenseDate = dateFormat(expense.date);
-      return last7Days.includes(expenseDate);
+      try {
+        const expenseDate = formatForChart(expense.date);
+        const isValidDate =
+          expenseDate !== "N/A" &&
+          expenseDate !== "Invalid Date" &&
+          expenseDate !== "Error";
+
+        if (!isValidDate) {
+          console.warn(
+            "Invalid expense date skipped:",
+            expense.date,
+            "->",
+            expenseDate
+          );
+          return false;
+        }
+
+        const isInRange = last7Days.includes(expenseDate);
+
+        // Debug - remove after fixing
+        if (isInRange) {
+          console.log(
+            "Expense included:",
+            expenseDate,
+            "Amount:",
+            expense.amount
+          );
+        }
+
+        return isInRange;
+      } catch (error) {
+        console.warn("Error processing expense date:", expense.date, error);
+        return false;
+      }
     });
 
     return { filteredIncomes, filteredExpenses, last7Days };
@@ -135,20 +193,63 @@ const Chart = () => {
   // Check if there's any data in the last 7 days
   const hasData = filteredIncomes.length > 0 || filteredExpenses.length > 0;
 
-  // Calculate totals for each of the last 7 days
+  // Calculate totals for each of the last 7 days - FIXED
   const incomeData = last7Days.map((date) => {
-    return filteredIncomes
-      .filter((income) => dateFormat(income.date) === date)
-      .reduce((sum, income) => sum + income.amount, 0);
+    try {
+      return filteredIncomes
+        .filter((income) => {
+          const incomeDate = formatForChart(income.date);
+          return incomeDate === date;
+        })
+        .reduce((sum, income) => sum + (income.amount || 0), 0);
+    } catch (error) {
+      console.warn("Error calculating income for date:", date, error);
+      return 0;
+    }
   });
 
   const expenseData = last7Days.map((date) => {
-    return filteredExpenses
-      .filter((expense) => dateFormat(expense.date) === date)
-      .reduce((sum, expense) => sum + expense.amount, 0);
+    try {
+      return filteredExpenses
+        .filter((expense) => {
+          const expenseDate = formatForChart(expense.date);
+          return expenseDate === date;
+        })
+        .reduce((sum, expense) => sum + (expense.amount || 0), 0);
+    } catch (error) {
+      console.warn("Error calculating expense for date:", date, error);
+      return 0;
+    }
   });
 
-  // Create chart options dynamically based on window width
+  const formatXAxisLabel = (dateStr) => {
+    if (!dateStr || dateStr === "N/A") return "N/A";
+
+    try {
+      const [day, month, year] = dateStr
+        .split("/")
+        .map((num) => parseInt(num, 10));
+      const date = new Date(year, month - 1, day);
+
+      if (isNaN(date.getTime())) {
+        return dateStr;
+      }
+
+      if (windowWidth < 480) {
+        const options =
+          windowWidth < 360
+            ? { weekday: "short" }
+            : { month: "short", day: "numeric" };
+        return date.toLocaleDateString("en-US", options);
+      }
+
+      return dateStr;
+    } catch (error) {
+      console.warn("Error formatting x-axis label:", dateStr, error);
+      return dateStr;
+    }
+  };
+
   const chartOptions = useMemo(
     () => ({
       responsive: true,
@@ -211,6 +312,24 @@ const Chart = () => {
               }
               return label;
             },
+            title: function (tooltipItems) {
+              const dateStr = tooltipItems[0].label;
+              if (!dateStr || dateStr === "N/A") return "Date: N/A";
+
+              try {
+                const [day, month, year] = dateStr.split("/");
+                const date = new Date(year, month - 1, day);
+                if (!isNaN(date.getTime())) {
+                  return date.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  });
+                }
+              } catch (error) {}
+              return `Date: ${dateStr}`;
+            },
           },
         },
       },
@@ -259,15 +378,7 @@ const Chart = () => {
             maxTicksLimit: 7,
             callback: function (value, index) {
               const label = this.getLabelForValue(value);
-              if (windowWidth < 480) {
-                const date = new Date(label);
-                const options =
-                  windowWidth < 360
-                    ? { weekday: "short" }
-                    : { month: "short", day: "numeric" };
-                return date.toLocaleDateString("en-US", options);
-              }
-              return label;
+              return formatXAxisLabel(label);
             },
           },
           title: {
@@ -296,27 +407,29 @@ const Chart = () => {
   // Chart data
   const chartData = useMemo(
     () => ({
-      labels: last7Days,
+      labels: last7Days.map((date) => formatXAxisLabel(date)),
       datasets: [
         {
           label: "Income",
           data: incomeData,
-          borderColor: "green",
-          backgroundColor: "rgba(0,128,0,0.4)",
+          borderColor: "#10B981",
+          backgroundColor: "rgba(16, 185, 129, 0.4)",
           tension: 0.3,
           fill: false,
           pointRadius: windowWidth < 768 ? 4 : 5,
           pointHoverRadius: windowWidth < 768 ? 6 : 8,
+          borderWidth: windowWidth < 768 ? 2 : 2.5,
         },
         {
           label: "Expenses",
           data: expenseData,
-          borderColor: "red",
-          backgroundColor: "rgba(255,0,0,0.4)",
+          borderColor: "#EF4444",
+          backgroundColor: "rgba(239, 68, 68, 0.4)",
           tension: 0.3,
           fill: false,
           pointRadius: windowWidth < 768 ? 4 : 5,
           pointHoverRadius: windowWidth < 768 ? 6 : 8,
+          borderWidth: windowWidth < 768 ? 2 : 2.5,
         },
       ],
     }),
@@ -333,7 +446,6 @@ const Chart = () => {
           redraw={true}
         />
       ) : hasData ? (
-        // Show loading state while chart initializes
         <div style={{ textAlign: "center", padding: "2rem" }}>
           Loading chart...
         </div>
