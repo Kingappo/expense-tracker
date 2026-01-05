@@ -461,6 +461,7 @@ const Budget = () => {
   const { budgets, getBudgets, deleteBudget } = useContext(AppContent);
   const [filter, setFilter] = useState("all");
   const [showFormOverlay, setShowFormOverlay] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -486,12 +487,27 @@ const Budget = () => {
     getBudgets();
   }, []);
 
-  const handleFormSubmit = () => {
-    setShowFormOverlay(false);
+  const handleFormSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await getBudgets();
+
+      setShowFormOverlay(false);
+    } catch (error) {
+      console.error("Error refreshing budgets:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target.className === "form-overlay") {
+      setShowFormOverlay(false);
+    }
   };
 
   return (
@@ -509,12 +525,17 @@ const Budget = () => {
         <button
           className="desktop-add-btn"
           onClick={() => setShowFormOverlay(true)}
+          disabled={isSubmitting}
         >
           Set Budget
         </button>
 
         <div className="filter-select">
-          <select value={filter} onChange={handleFilterChange}>
+          <select
+            value={filter}
+            onChange={handleFilterChange}
+            disabled={isSubmitting}
+          >
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
@@ -529,6 +550,7 @@ const Budget = () => {
         className="mobile-add-btn"
         onClick={() => setShowFormOverlay(true)}
         title="Set New Budget"
+        disabled={isSubmitting}
       >
         Set
         <br />
@@ -536,12 +558,13 @@ const Budget = () => {
       </button>
 
       {showFormOverlay && (
-        <div className="form-overlay">
+        <div className="form-overlay" onClick={handleOverlayClick}>
           <div className="form-container">
             <button
               className="close-btn"
               onClick={() => setShowFormOverlay(false)}
               aria-label="Close form"
+              disabled={isSubmitting}
             >
               ×
             </button>
@@ -587,3 +610,134 @@ const Budget = () => {
 };
 
 export default Budget;
+
+// const Budget = () => {
+//   const { budgets, getBudgets, deleteBudget } = useContext(AppContent);
+//   const [filter, setFilter] = useState("all");
+//   const [showFormOverlay, setShowFormOverlay] = useState(false);
+
+//   const categories = [
+//     { value: "all", label: "All Categories" },
+//     { value: "food", label: "Food" },
+//     { value: "health", label: "Health" },
+//     { value: "transport", label: "Transport" },
+//     { value: "rent", label: "Rent" },
+//     { value: "airtime", label: "Airtime" },
+//     { value: "data", label: "Data" },
+//     { value: "school", label: "School" },
+//     { value: "other", label: "Other" },
+//   ];
+
+//   const filteredBudgets =
+//     filter === "all" ? budgets : budgets.filter((b) => b.category === filter);
+
+//   const filteredTotal = filteredBudgets.reduce(
+//     (acc, b) => acc + (b.amount || 0),
+//     0
+//   );
+
+//   useEffect(() => {
+//     getBudgets();
+//   }, []);
+
+//   const handleFormSubmit = () => {
+//     setShowFormOverlay(false);
+//   };
+
+//   const handleFilterChange = (e) => {
+//     setFilter(e.target.value);
+//   };
+
+//   return (
+//     <BudgetStyled>
+//       <h1>Monthly Budgets</h1>
+//       <div className="total-budget">
+//         Total Budget:{" "}
+//         <span>
+//           {naira}
+//           {filteredTotal}
+//         </span>
+//       </div>
+
+//       <div className="controls-container">
+//         <button
+//           className="desktop-add-btn"
+//           onClick={() => setShowFormOverlay(true)}
+//         >
+//           Set Budget
+//         </button>
+
+//         <div className="filter-select">
+//           <select value={filter} onChange={handleFilterChange}>
+//             {categories.map((cat) => (
+//               <option key={cat.value} value={cat.value}>
+//                 {cat.label}
+//               </option>
+//             ))}
+//           </select>
+//           <div className="select-arrow">▼</div>
+//         </div>
+//       </div>
+
+//       <button
+//         className="mobile-add-btn"
+//         onClick={() => setShowFormOverlay(true)}
+//         title="Set New Budget"
+//       >
+//         Set
+//         <br />
+//         Budget
+//       </button>
+
+//       {showFormOverlay && (
+//         <div className="form-overlay">
+//           <div className="form-container">
+//             <button
+//               className="close-btn"
+//               onClick={() => setShowFormOverlay(false)}
+//               aria-label="Close form"
+//             >
+//               ×
+//             </button>
+//             <BudgetForm onBudgetSaved={handleFormSubmit} />
+//           </div>
+//         </div>
+//       )}
+
+//       <div className="budget-content">
+//         <div className="budget-list">
+//           {filteredBudgets.length === 0 ? (
+//             <p className="empty-message">
+//               {filter === "all"
+//                 ? "No budget set yet. Click 'Set Budget' to create one."
+//                 : `No budget set for "${
+//                     categories.find((c) => c.value === filter)?.label
+//                   }" category. Click 'Set Budget' to create one.`}
+//             </p>
+//           ) : (
+//             filteredBudgets.map((budget) => (
+//               <div key={budget._id}>
+//                 <BudgetItem
+//                   id={budget._id}
+//                   title={budget.title}
+//                   amount={budget.amount}
+//                   month={budget.month}
+//                   category={budget.category}
+//                   indicatorColor="#1abc9c"
+//                   deleteItem={deleteBudget}
+//                   isMainHistory={true}
+//                 />
+//                 <BudgetProgress
+//                   category={budget.category}
+//                   month={budget.month}
+//                 />
+//               </div>
+//             ))
+//           )}
+//         </div>
+//       </div>
+//     </BudgetStyled>
+//   );
+// };
+
+// export default Budget;

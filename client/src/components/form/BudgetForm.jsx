@@ -84,8 +84,7 @@ const Button = styled.button`
 `;
 
 const BudgetForm = ({ onBudgetSaved }) => {
-  const { backendUrl, getUserData, addBudget, categories } =
-    useContext(AppContent);
+  const { addBudget } = useContext(AppContent);
 
   const [month, setMonth] = useState("");
   const [title, setTitle] = useState("");
@@ -120,15 +119,24 @@ const BudgetForm = ({ onBudgetSaved }) => {
     setLoading(true);
     try {
       await addBudget({ month, title, category, amount });
+
+      // Reset form fields
       setMonth("");
       setTitle("");
       setCategory("");
       setAmount("");
-      if (onBudgetSaved) onBudgetSaved();
+
+      // Call the callback to close the form
+      if (onBudgetSaved) {
+        onBudgetSaved();
+      }
+    } catch (error) {
+      toast.error("Failed to save budget. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <FormContainer>
       <FormTitle>Add New Budget</FormTitle>
@@ -141,6 +149,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
             value={month}
             onChange={(e) => setMonth(e.target.value)}
             required
+            disabled={loading}
           >
             <option value="">-- Select Month --</option>
             {months.map((m, index) => (
@@ -160,6 +169,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            disabled={loading}
           />
         </FormGroup>
 
@@ -170,6 +180,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
+            disabled={loading}
           >
             <option value="">-- Select Category --</option>
             <option value="food">Food</option>
@@ -192,6 +203,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             required
+            disabled={loading}
           />
         </FormGroup>
 
@@ -204,3 +216,125 @@ const BudgetForm = ({ onBudgetSaved }) => {
 };
 
 export default BudgetForm;
+
+// const BudgetForm = ({ onBudgetSaved }) => {
+//   const { backendUrl, getUserData, addBudget, categories } =
+//     useContext(AppContent);
+
+//   const [month, setMonth] = useState("");
+//   const [title, setTitle] = useState("");
+//   const [category, setCategory] = useState("");
+//   const [amount, setAmount] = useState("");
+//   const [loading, setLoading] = useState(false);
+
+//   const currentMonthIndex = new Date().getMonth();
+
+//   const months = [
+//     "January",
+//     "February",
+//     "March",
+//     "April",
+//     "May",
+//     "June",
+//     "July",
+//     "August",
+//     "September",
+//     "October",
+//     "November",
+//     "December",
+//   ];
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     if (!month || !title || !category || !amount) {
+//       toast.error("Please fill all fields.");
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await addBudget({ month, title, category, amount });
+//       setMonth("");
+//       setTitle("");
+//       setCategory("");
+//       setAmount("");
+//       if (onBudgetSaved) onBudgetSaved();
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+//   return (
+//     <FormContainer>
+//       <FormTitle>Add New Budget</FormTitle>
+
+//       <Form onSubmit={handleSubmit}>
+//         {/* Month */}
+//         <FormGroup>
+//           <Label>Select Month</Label>
+//           <Select
+//             value={month}
+//             onChange={(e) => setMonth(e.target.value)}
+//             required
+//           >
+//             <option value="">-- Select Month --</option>
+//             {months.map((m, index) => (
+//               <option key={m} value={m} disabled={index < currentMonthIndex}>
+//                 {m}
+//               </option>
+//             ))}
+//           </Select>
+//         </FormGroup>
+
+//         {/* Title */}
+//         <FormGroup>
+//           <Label>Budget Title</Label>
+//           <Input
+//             type="text"
+//             placeholder="e.g. Food Budget"
+//             value={title}
+//             onChange={(e) => setTitle(e.target.value)}
+//             required
+//           />
+//         </FormGroup>
+
+//         {/* select */}
+//         <FormGroup>
+//           <Label>Select Category</Label>
+//           <Select
+//             value={category}
+//             onChange={(e) => setCategory(e.target.value)}
+//             required
+//           >
+//             <option value="">-- Select Category --</option>
+//             <option value="food">Food</option>
+//             <option value="health">Health</option>
+//             <option value="transport">Transport</option>
+//             <option value="rent">House Rent</option>
+//             <option value="airtime">Airtime</option>
+//             <option value="data">Data</option>
+//             <option value="school">School</option>
+//             <option value="other">Others</option>
+//           </Select>
+//         </FormGroup>
+
+//         {/* Amount */}
+//         <FormGroup>
+//           <Label>Budget Amount (₦)</Label>
+//           <Input
+//             type="number"
+//             placeholder="Enter amount"
+//             value={amount}
+//             onChange={(e) => setAmount(e.target.value)}
+//             required
+//           />
+//         </FormGroup>
+
+//         <Button type="submit" disabled={loading}>
+//           {loading ? "Saving..." : "Set Budget"}
+//         </Button>
+//       </Form>
+//     </FormContainer>
+//   );
+// };
+
+// export default BudgetForm;
