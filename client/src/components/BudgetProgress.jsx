@@ -3,7 +3,10 @@ import styled from "styled-components";
 import { AppContent } from "../context/AppContext";
 
 const BarContainer = styled.div`
-  margin: 1rem 0;
+  margin-bottom: 1rem;
+  @media (max-width: 480px) {
+    width: 130%;
+  }
 `;
 
 const Bar = styled.div`
@@ -70,7 +73,7 @@ const BudgetProgress = ({ category, month }) => {
         {exceeded
           ? "Budget Exceeded!"
           : `Progress: ₦${spentAmount} / ₦${totalBudget}`}
-        <span>Used: {percent}%</span>
+        <span>{percent}%</span>
       </InfoText>
     </BarContainer>
   );

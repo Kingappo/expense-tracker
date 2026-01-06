@@ -163,7 +163,7 @@ const IncomeItemStyled = styled.div`
     padding: 0.7rem;
     gap: 0.7rem;
     text-align: left;
-    min-width: min-content;
+    min-width: 180%;
     margin-bottom: 1rem;
 
     .icon {

@@ -196,7 +196,7 @@ const ExpenseStyled = styled.div`
 
   .expenses-content {
     .expenses-list {
-      max-height: 70vh;
+      max-height: 35vh;
       overflow-y: auto;
       padding-right: 0.5rem;
       scrollbar-width: thin;

@@ -196,7 +196,7 @@ const IncomeStyled = styled.div`
 
   .income-content {
     .incomes {
-      max-height: 70vh;
+      max-height: 40vh;
       overflow-y: auto;
       padding-right: 0.5rem;
       scrollbar-width: thin;
