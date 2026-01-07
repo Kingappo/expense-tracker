@@ -472,6 +472,7 @@ const Expenses = () => {
     { value: "all", label: "All Categories" },
     { value: "food", label: "Food" },
     { value: "health", label: "Health" },
+    { value: "shopping", label: "Shopping" },
     { value: "transport", label: "Transport" },
     { value: "rent", label: "Rent" },
     { value: "airtime", label: "Airtime" },

@@ -17,6 +17,7 @@ import {
   piggy,
   rent,
   school,
+  shopping,
   stocks,
   transport,
   trash,
@@ -332,7 +333,7 @@ const IncomeItem = ({
     switch (category) {
       case "salary":
         return money;
-      case "freelancing":
+      case "freelance":
         return freelance;
       case "investment":
         return stocks;
@@ -365,6 +366,8 @@ const IncomeItem = ({
         return airtime;
       case "data":
         return data;
+      case "shopping":
+        return shopping;
       case "other":
         return piggy;
       default:

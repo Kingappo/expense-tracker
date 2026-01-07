@@ -57,57 +57,17 @@ export const dateFormat = (dateInput) => {
 };
 
 export const timeFormat = (dateInput) => {
-  try {
-    // Handle null/undefined
-    if (!dateInput) {
-      return "N/A";
-    }
+  if (!dateInput) return "No time";
 
-    // If it's already a valid moment object
-    if (moment.isMoment(dateInput) && dateInput.isValid()) {
-      return dateInput.format("hh:mm A");
-    }
+  const m = moment(dateInput);
 
-    // Handle string dates
-    if (typeof dateInput === "string") {
-      let m;
+  if (!m.isValid()) return "No time";
 
-      // ISO format
-      if (dateInput.includes("T") && dateInput.endsWith("Z")) {
-        m = moment.utc(dateInput).local();
-      }
-      // Try default parsing
-      else {
-        m = moment(dateInput);
-      }
-
-      if (m.isValid()) {
-        return m.format("hh:mm A");
-      }
-    }
-
-    // Handle Date objects
-    if (dateInput instanceof Date) {
-      if (!isNaN(dateInput.getTime())) {
-        return moment(dateInput).format("hh:mm A");
-      }
-    }
-
-    // Handle timestamps
-    if (typeof dateInput === "number") {
-      const m = moment(dateInput);
-      if (m.isValid()) {
-        return m.format("hh:mm A");
-      }
-    }
-
-    // Default
-    const m = moment(dateInput);
-    return m.isValid() ? m.format("hh:mm A") : "N/A";
-  } catch (error) {
-    console.error("Error in timeFormat:", error);
-    return "N/A";
+  if (m.hour() === 0 && m.minute() === 0 && m.second() === 0) {
+    return "Nos time";
   }
+
+  return m.format("hh:mm A");
 };
 
 export const formatForChart = (dateInput) => {
@@ -154,6 +114,30 @@ export const isSameDay = (date1, date2) => {
     }
 
     return m1.format("DD/MM/YYYY") === m2.format("DD/MM/YYYY");
+  } catch (error) {
+    return false;
+  }
+};
+
+// NEW: Check if date has time component
+export const hasTimeComponent = (dateInput) => {
+  try {
+    if (!dateInput) return false;
+
+    const dateStr = String(dateInput);
+
+    // If it's an ISO string with time, it has time component
+    if (dateStr.includes("T") && dateStr.includes(":")) {
+      return true;
+    }
+
+    // Check for other time patterns
+    const timePatterns = [
+      /\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?/i,
+      /\s+\d{1,2}:\d{2}(:\d{2})?/,
+    ];
+
+    return timePatterns.some((pattern) => pattern.test(dateStr));
   } catch (error) {
     return false;
   }

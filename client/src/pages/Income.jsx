@@ -489,7 +489,7 @@ const Income = () => {
   const categories = [
     { value: "all", label: "All Categories" },
     { value: "salary", label: "Salary" },
-    { value: "freelancing", label: "Freelancing" },
+    { value: "freelance", label: "Freelance" },
     { value: "investment", label: "Investment" },
     { value: "business", label: "Business" },
     { value: "gift", label: "Gift" },

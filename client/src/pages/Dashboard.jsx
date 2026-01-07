@@ -138,7 +138,8 @@ const DashboardStyled = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-top: 2rem;
+    margin: 0.6rem 0 1.5rem 0;
+    cursor: pointer;
 
     .income,
     .expense,
@@ -511,32 +512,30 @@ function Dashboard() {
             {isDownloading ? "Downloading..." : "Generate Report"}
           </button>
         </div>
+
+        <div className="amount-con">
+          <div className="income" onClick={() => navigation("/income")}>
+            <h2>Total Income ({naira})</h2>
+            <p style={{ color: "green" }}>{totalIncome()}</p>
+          </div>
+          <div className="expense" onClick={() => navigation("/expenses")}>
+            <h2>Total Expenses ({naira})</h2>
+            <p style={{ color: "red" }}>{totalExpense()}</p>
+          </div>
+          <div className="balance">
+            <h2>Total Balance ({naira})</h2>
+            <p style={{ color: balance() < 0 ? "red" : "#222260" }}>
+              {balance()}
+            </p>
+          </div>
+        </div>
+
         <div className="stats-con">
           <div className="chart-con">
             <Chart />
           </div>
           <div className="history-con">
             <History />
-          </div>
-        </div>
-        <div className="amount-con">
-          <div className="income">
-            <h2>Total Income</h2>
-            <p style={{ color: "green" }}>
-              {naira} {totalIncome()}
-            </p>
-          </div>
-          <div className="expense">
-            <h2>Total Expenses</h2>
-            <p style={{ color: "red" }}>
-              {naira} {totalExpense()}
-            </p>
-          </div>
-          <div className="balance">
-            <h2>Total Balance</h2>
-            <p style={{ color: "#222260" }}>
-              {naira} {balance()}
-            </p>
           </div>
         </div>
         <div id="report-content" className="report-hidden">

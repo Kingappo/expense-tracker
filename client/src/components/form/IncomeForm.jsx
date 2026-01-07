@@ -145,11 +145,11 @@ const IncomeForm = ({ onFormSubmit }) => {
               Select Category
             </option>
             <option value="salary">Salary</option>
-            <option value="investment">Investment</option>
-            <option value="farming">Farming</option>
-            <option value="gift">Gift</option>
-            <option value="freelancing">Freelance</option>
             <option value="business">Business</option>
+            <option value="gift">Gift</option>
+            <option value="investment">Investment</option>
+            <option value="freelance">Freelance</option>
+            <option value="farming">Farming</option>
             <option value="others">Others</option>
           </select>
         </div>

@@ -24,6 +24,7 @@ const ReportItemStyled = styled.div`
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      color: #222260;
 
       p {
         margin: 0.2rem 0;
@@ -274,16 +275,14 @@ function ReportItem() {
         <div className="details">
           <div className="user-details">
             <p>
-              <strong style={{ color: "#123f3f" }}>Name:</strong>{" "}
+              <strong>Name:</strong>{" "}
               {userData ? `${userData.firstName} ${userData.surname}` : "N/A"}
             </p>
             <p>
-              <strong style={{ color: "#123f3f" }}>Email:</strong>{" "}
-              {userData?.email || "N/A"}
+              <strong>Email:</strong> {userData?.email || "N/A"}
             </p>
             <p>
-              <strong style={{ color: "#123f3f" }}>Generated:</strong>{" "}
-              {new Date().toLocaleString()}
+              <strong>Generated:</strong> {new Date().toLocaleString()}
             </p>
           </div>
         </div>
@@ -334,7 +333,7 @@ function ReportItem() {
               </div>
             </div>
 
-            {/* Category Summary */}
+            {/* Expense Category Summary */}
             <div className="each-table">
               <h4>Expenses Breakdown</h4>
               <div className="table-wrapper">
@@ -342,15 +341,18 @@ function ReportItem() {
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th>Total Spent</th>
+                      <th>Total Spent (NGN) </th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
                       "Transport",
                       "Food",
-                      "Rent",
                       "Health",
+                      "Airtime",
+                      "Data",
+                      "Shopping",
+                      "Rent",
                       "School",
                       "Other",
                     ].map((cat) => {
@@ -364,7 +366,7 @@ function ReportItem() {
                         <tr key={cat}>
                           <td>{cat}</td>
                           <td style={{ color: "red" }}>
-                            NGN {spent.toLocaleString()}
+                            {spent.toLocaleString()}
                           </td>
                         </tr>
                       );
@@ -382,8 +384,8 @@ function ReportItem() {
                   <thead>
                     <tr>
                       <th>Category</th>
-                      <th>Limit</th>
-                      <th>Spent</th>
+                      <th>Limit (NGN) </th>
+                      <th>Spent (NGN) </th>
                       <th>Usage</th>
                     </tr>
                   </thead>
@@ -403,9 +405,9 @@ function ReportItem() {
                       return (
                         <tr key={b._id}>
                           <td>{b.category}</td>
-                          <td>NGN {b.amount.toLocaleString()}</td>
+                          <td> {b.amount.toLocaleString()}</td>
                           <td style={{ color: "red" }}>
-                            NGN {spent.toLocaleString()}
+                            {spent.toLocaleString()}
                           </td>
                           <td style={{ color: usageColor, fontWeight: "bold" }}>
                             {usage}%
@@ -429,7 +431,7 @@ function ReportItem() {
                       <th>Type</th>
                       <th>Category</th>
                       <th>Description</th>
-                      <th style={{ textAlign: "left" }}>Amount</th>
+                      <th style={{ textAlign: "left" }}>Amount (NGN) </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -464,7 +466,7 @@ function ReportItem() {
                                 textAlign: "left",
                               }}
                             >
-                              {prefix} NGN {t.amount.toLocaleString()}
+                              {prefix} {t.amount.toLocaleString()}
                             </td>
                           </tr>
                         );

@@ -161,6 +161,7 @@ const ExpenseForm = ({ onFormSubmit }) => {
           </option>
           <option value="food">Food</option>
           <option value="health">Health</option>
+          <option value="shopping">Shopping</option>
           <option value="transport">Transport</option>
           <option value="rent">House Rent</option>
           <option value="airtime">Airtime</option>

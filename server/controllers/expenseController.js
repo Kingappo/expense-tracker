@@ -32,7 +32,6 @@ export const addExpense = async (req, res) => {
       periodType: "monthly",
       type: "expense",
     });
-
     await newExpense.save();
     const user = await userModel.findById(userId).select("email firstName");
 

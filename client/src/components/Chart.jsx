@@ -12,7 +12,7 @@ import {
 import { Line } from "react-chartjs-2";
 import styled from "styled-components";
 import { AppContent } from "../context/AppContext";
-import { dateFormat, formatForChart } from "../utils/dateFormat";
+import { formatForChart } from "../utils/dateFormat";
 
 Chartjs.register(
   CategoryScale,
@@ -73,7 +73,6 @@ const Chart = () => {
   const [isChartReady, setIsChartReady] = useState(false);
   const chartRef = useRef(null);
 
-  // Update window width on resize
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -91,7 +90,6 @@ const Chart = () => {
     };
   }, []);
 
-  // Force chart update when window width changes
   useEffect(() => {
     if (chartRef.current && chartRef.current.chartInstance) {
       chartRef.current.chartInstance.resize();
@@ -99,7 +97,7 @@ const Chart = () => {
     }
   }, [windowWidth]);
 
-  // Calculate date range for last 7 days
+  // last 7 days dates
   const getLast7Days = () => {
     const dates = [];
     const today = new Date();
@@ -168,16 +166,6 @@ const Chart = () => {
 
         const isInRange = last7Days.includes(expenseDate);
 
-        // Debug - remove after fixing
-        if (isInRange) {
-          console.log(
-            "Expense included:",
-            expenseDate,
-            "Amount:",
-            expense.amount
-          );
-        }
-
         return isInRange;
       } catch (error) {
         console.warn("Error processing expense date:", expense.date, error);
@@ -193,7 +181,6 @@ const Chart = () => {
   // Check if there's any data in the last 7 days
   const hasData = filteredIncomes.length > 0 || filteredExpenses.length > 0;
 
-  // Calculate totals for each of the last 7 days - FIXED
   const incomeData = last7Days.map((date) => {
     try {
       return filteredIncomes
