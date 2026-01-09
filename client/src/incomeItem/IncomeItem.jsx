@@ -22,7 +22,7 @@ import {
   transport,
   trash,
 } from "../utils/icon";
-import { dateFormat } from "../utils/dateFormat";
+import { dateFormat, timeFormat } from "../utils/dateFormat";
 
 const IncomeItemStyled = styled.div`
   background: #fcf6f9;
@@ -103,12 +103,14 @@ const IncomeItemStyled = styled.div`
         display: flex;
         align-items: center;
         gap: 0.3rem;
-        color: var(--primary-color);
         opacity: 0.8;
         margin: 0;
         font-size: 0.9rem;
         white-space: nowrap;
-        flex-shrink: 0; /* Prevent text from shrinking */
+        flex-shrink: 0;
+      }
+      span {
+        font-size: 0.7rem;
       }
 
       .btn-con {
@@ -290,32 +292,6 @@ const IncomeItemStyled = styled.div`
   }
 `;
 
-export const IncomeItemsContainer = styled.div`
-  width: 100%;
-
-  @media (max-width: 480px) {
-    overflow-y: auto;
-    max-height: 400px;
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 10px;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8;
-    }
-  }
-`;
-
 const IncomeItem = ({
   id,
   title,
@@ -366,6 +342,8 @@ const IncomeItem = ({
         return airtime;
       case "data":
         return data;
+      case "gift":
+        return gift;
       case "shopping":
         return shopping;
       case "other":
@@ -413,8 +391,9 @@ const IncomeItem = ({
             <p>
               {naira} {amount}
             </p>
+
             <p>
-              {calender} {dateFormat(date)}
+              {calender} {dateFormat(date)} <span>at {timeFormat(date)} </span>
             </p>
             <p>
               {comment} {description}

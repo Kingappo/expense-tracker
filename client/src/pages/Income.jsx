@@ -4,7 +4,6 @@ import { InnerLayOut } from "../styles/Layout";
 import IncomeForm from "../components/form/IncomeForm";
 import IncomeItem from "../incomeItem/IncomeItem";
 import { AppContent } from "../context/AppContext";
-import { naira } from "../utils/icon";
 
 const IncomeStyled = styled.div`
   h1 {
@@ -520,11 +519,8 @@ const Income = () => {
       <InnerLayOut>
         <h1>Incomes</h1>
         <div className="total-income">
-          Total Income:{" "}
-          <span>
-            {naira}
-            {filteredTotal}
-          </span>
+          Total Income:
+          <span>₦{filteredTotal}</span>
         </div>
 
         <div className="controls-container">

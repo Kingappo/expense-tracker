@@ -3,8 +3,10 @@ import styled from "styled-components";
 import Swal from "sweetalert2";
 import {
   airtime,
+  calender,
   data,
   food,
+  gift,
   medical,
   naira,
   piggy,
@@ -13,6 +15,7 @@ import {
   transport,
   trash,
 } from "../utils/icon";
+import { formatDateOnly, formatTimeOnly } from "../utils/dateFormat";
 
 const IncomeItemStyled = styled.div`
   background: #fcf6f9;
@@ -81,13 +84,13 @@ const IncomeItemStyled = styled.div`
       .text {
         display: flex;
         align-items: center;
-        gap: ${(props) => (props.isMainHistory ? "3rem" : "1.5rem")};
+        gap: ${(props) => (props.isMainHistory ? "2rem" : "1.5rem")};
         flex: 1;
         flex-wrap: wrap;
+
         .am {
           color: #242451;
           font-weight: 600;
-          margin-bottom: 0.3rem;
         }
         .month {
           padding: 0.1rem 0.8rem;
@@ -95,16 +98,24 @@ const IncomeItemStyled = styled.div`
           border: 1px solid #242451;
           box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
-      }
 
-      p {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        opacity: 0.8;
-        margin: 0;
-        font-size: 1rem;
-        white-space: nowrap;
+        .datetime-container {
+          display: flex;
+          flex-direction: column;
+          gap: 0.2rem;
+          min-width: 120px;
+
+          .date-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin: 0;
+            span {
+              font-size: 0.7rem;
+            }
+          }
+        }
       }
 
       .btn-con {
@@ -143,7 +154,21 @@ const IncomeItemStyled = styled.div`
 
       .inner-content {
         .text {
-          gap: ${(props) => (props.isMainHistory ? "2rem" : "1rem")};
+          gap: ${(props) => (props.isMainHistory ? "1.5rem" : "1rem")};
+
+          .datetime-container {
+            min-width: 110px;
+
+            .date-item {
+              font-size: 0.85rem;
+              gap: 0.4rem;
+
+              &.time-item {
+                font-size: 0.8rem;
+                margin-left: 1.2rem;
+              }
+            }
+          }
         }
 
         p {
@@ -189,13 +214,19 @@ const IncomeItemStyled = styled.div`
         .text {
           flex-direction: column;
           align-items: flex-start;
-          gap: 0.3rem;
+          gap: 0.8rem;
           width: 100%;
-        }
 
-        p {
-          font-size: 0.85rem;
-          justify-content: flex-start;
+          .datetime-container {
+            width: 100%;
+            min-width: auto;
+
+            .date-item {
+              font-size: 0.85rem;
+              justify-content: flex-start;
+              width: 100%;
+            }
+          }
         }
 
         .btn-con {
@@ -227,8 +258,16 @@ const IncomeItemStyled = styled.div`
       }
 
       .inner-content {
-        p {
-          font-size: 0.8rem;
+        .text {
+          .datetime-container {
+            .date-item {
+              font-size: 0.8rem;
+
+              &.time-item {
+                font-size: 0.75rem;
+              }
+            }
+          }
         }
       }
     }
@@ -252,12 +291,17 @@ const IncomeItemStyled = styled.div`
 
       .inner-content {
         .text {
-          gap: ${(props) => (props.isMainHistory ? "3rem" : "1.5rem")};
-        }
+          gap: ${(props) => (props.isMainHistory ? "2rem" : "1.5rem")};
 
-        p {
-          font-size: 1rem;
-          gap: 0.5rem;
+          .datetime-container {
+            .date-item {
+              font-size: 0.9rem;
+
+              &.time-item {
+                font-size: 0.85rem;
+              }
+            }
+          }
         }
       }
     }
@@ -274,6 +318,8 @@ const BudgetItem = ({
   indicatorColor,
   showDelete = true,
   isMainHistory = false,
+  createdAt,
+  updatedAt,
 }) => {
   const expenseCategory = () => {
     switch (category) {
@@ -289,6 +335,8 @@ const BudgetItem = ({
         return airtime;
       case "data":
         return data;
+      case "gift":
+        return gift;
       case "school":
         return school;
       case "other":
@@ -323,6 +371,10 @@ const BudgetItem = ({
     });
   };
 
+  const timestamp = updatedAt || createdAt;
+  const formattedDate = timestamp ? formatDateOnly(timestamp) : "N/A";
+  const formattedTime = timestamp ? formatTimeOnly(timestamp) : "No time";
+
   return (
     <IncomeItemStyled indicator={indicatorColor} isMainHistory={isMainHistory}>
       <div className="icon">{expenseCategory()}</div>
@@ -335,6 +387,12 @@ const BudgetItem = ({
               {naira} {amount}
             </p>
             <p className="month">{month}</p>
+
+            <div className="datetime-container">
+              <p className="date-item">
+                {calender} {formattedDate} <span>at {formattedTime}</span>
+              </p>
+            </div>
           </div>
 
           {showDelete && (

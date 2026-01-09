@@ -353,6 +353,7 @@ function ReportItem() {
                       "Data",
                       "Shopping",
                       "Rent",
+                      "Gift",
                       "School",
                       "Other",
                     ].map((cat) => {

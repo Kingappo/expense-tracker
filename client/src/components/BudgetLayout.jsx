@@ -24,10 +24,12 @@ const BudgetStyled = styled.div`
     margin: 1rem 0;
     border-radius: 20px;
     font-size: 1.5rem;
+    font-weight: 700;
     gap: 0.5rem;
     text-align: center;
     flex-wrap: wrap;
-    span {
+    color: #222260;
+    .bud-amount {
       font-size: 2rem;
       color: #1abc9c;
       font-weight: 700;
@@ -388,9 +390,14 @@ const BudgetStyled = styled.div`
     }
 
     .total-budget {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
       font-size: 1rem;
 
-      span {
+      .bud-amount {
         font-size: 1.2rem;
       }
     }
@@ -471,6 +478,7 @@ const Budget = () => {
     { value: "rent", label: "Rent" },
     { value: "airtime", label: "Airtime" },
     { value: "data", label: "Data" },
+    { value: "gift", label: "Gift" },
     { value: "school", label: "School" },
     { value: "other", label: "Other" },
   ];
@@ -518,11 +526,8 @@ const Budget = () => {
       <h1>Monthly Budgets {isRefreshing && "🔄"}</h1>
 
       <div className="total-budget">
-        Total Budget:{" "}
-        <span>
-          {naira}
-          {filteredTotal}
-        </span>
+        <span>Total Budget:</span>
+        <span className="bud-amount">₦{filteredTotal}</span>
       </div>
 
       <div className="controls-container">
@@ -599,6 +604,8 @@ const Budget = () => {
                   indicatorColor="#1abc9c"
                   deleteItem={deleteBudget}
                   isMainHistory={true}
+                  createdAt={budget.createdAt}
+                  updatedAt={budget.updatedAt}
                 />
                 <BudgetProgress
                   category={budget.category}

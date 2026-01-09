@@ -71,11 +71,11 @@ export const setBudget = async (req, res) => {
           type: "info",
         });
       }
-
       return res.json({
         success: true,
         message: `${category} budget updated successfully`,
         budget: existingBudget,
+        setAt: existingBudget.updatedAt,
       });
     }
 
@@ -109,6 +109,7 @@ export const setBudget = async (req, res) => {
       success: true,
       message: `${category} budget created successfully`,
       budget: newBudget,
+      setAt: newBudget.createdAt,
     });
   } catch (error) {
     console.error("Budget error:", error.message);
@@ -142,6 +143,7 @@ export const getBudget = async (req, res) => {
     return res.json({
       success: true,
       budget,
+      setAt: budget.updatedAt,
     });
   } catch (error) {
     res.status(500).json({
@@ -163,7 +165,10 @@ export const getAllBudgets = async (req, res) => {
 
     res.json({
       success: true,
-      budgets,
+      budgets: budgets.map((budget) => ({
+        ...budget.toObject(),
+        setAt: budget.updatedAt,
+      })),
     });
   } catch (error) {
     res.status(500).json({

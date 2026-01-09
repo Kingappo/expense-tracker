@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { InnerLayOut } from "../styles/Layout";
 import IncomeItem from "../incomeItem/IncomeItem";
 import { AppContent } from "../context/AppContext";
-import { naira } from "../utils/icon";
 import ExpenseForm from "../components/form/ExpensesForm";
 
 const ExpenseStyled = styled.div`
@@ -14,10 +13,7 @@ const ExpenseStyled = styled.div`
   }
 
   .total-expenses {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    text-align: center;
     background: #fcf6f9;
     border: 2px solid #ffffff;
     box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
@@ -30,11 +26,9 @@ const ExpenseStyled = styled.div`
     h3 {
       margin: 0;
       span {
-        font-size: 2rem;
+        font-size: 1.6;
         color: #fd3a3a;
         font-weight: 700;
-        display: flex;
-        align-items: center;
         gap: 0.3rem;
       }
     }
@@ -398,6 +392,10 @@ const ExpenseStyled = styled.div`
 
       h3 span {
         font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.4rem;
       }
     }
 
@@ -477,6 +475,7 @@ const Expenses = () => {
     { value: "rent", label: "Rent" },
     { value: "airtime", label: "Airtime" },
     { value: "data", label: "Data" },
+    { value: "gift", label: "Gift" },
     { value: "school", label: "School" },
     { value: "other", label: "Other" },
   ];
@@ -505,11 +504,8 @@ const Expenses = () => {
         <h1>Expenses</h1>
         <div className="total-expenses">
           <h3>
-            Total Expenses:{" "}
-            <span>
-              {naira}
-              {filteredTotal.toLocaleString()}
-            </span>
+            Total Expenses:
+            <span> ₦{filteredTotal.toLocaleString()}</span>
           </h3>
         </div>
 

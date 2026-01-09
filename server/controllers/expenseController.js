@@ -16,7 +16,32 @@ export const addExpense = async (req, res) => {
       });
     }
 
+    // const expenseDate = new Date(date);
+    // const month = expenseDate.toLocaleString("default", { month: "long" });
+    // const year = expenseDate.getFullYear().toString();
+
+    // const newExpense = new expenseModel({
+    //   user: userId,
+    //   title,
+    //   amount,
+    //   date,
+    //   category,
+    //   description,
+    //   month,
+    //   year,
+    //   periodType: "monthly",
+    //   type: "expense",
+    // });
+
     const expenseDate = new Date(date);
+    const now = new Date();
+    expenseDate.setHours(
+      now.getHours(),
+      now.getMinutes(),
+      now.getSeconds(),
+      now.getMilliseconds()
+    );
+
     const month = expenseDate.toLocaleString("default", { month: "long" });
     const year = expenseDate.getFullYear().toString();
 
@@ -24,7 +49,7 @@ export const addExpense = async (req, res) => {
       user: userId,
       title,
       amount,
-      date,
+      date: expenseDate, // Use the date with time
       category,
       description,
       month,
@@ -32,6 +57,8 @@ export const addExpense = async (req, res) => {
       periodType: "monthly",
       type: "expense",
     });
+    // await newExpense.save();
+
     await newExpense.save();
     const user = await userModel.findById(userId).select("email firstName");
 

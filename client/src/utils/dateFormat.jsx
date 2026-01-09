@@ -48,10 +48,10 @@ export const dateFormat = (dateInput) => {
         return m.format("DD/MM/YYYY");
       }
     }
-    console.warn("Could not parse date input:", dateInput, typeof dateInput);
+    // console.warn("Could not parse date input:", dateInput, typeof dateInput);
     return "Invalid Date";
   } catch (error) {
-    console.error("Error in dateFormat:", error, "Input:", dateInput);
+    // console.error("Error in dateFormat:", error, "Input:", dateInput);
     return "Error";
   }
 };
@@ -64,10 +64,46 @@ export const timeFormat = (dateInput) => {
   if (!m.isValid()) return "No time";
 
   if (m.hour() === 0 && m.minute() === 0 && m.second() === 0) {
-    return "Nos time";
+    return "No time";
   }
 
   return m.format("hh:mm A");
+};
+
+export const formatDateOnly = (dateInput) => {
+  try {
+    if (!dateInput) {
+      return "N/A";
+    }
+
+    const m = moment(dateInput);
+
+    if (!m.isValid()) {
+      return "Invalid Date";
+    }
+
+    return m.format("DD/MM/YYYY");
+  } catch (error) {
+    return "Error";
+  }
+};
+
+export const formatTimeOnly = (dateInput) => {
+  try {
+    if (!dateInput) {
+      return "No time";
+    }
+
+    const m = moment(dateInput);
+
+    if (!m.isValid()) {
+      return "No time";
+    }
+
+    return m.format("hh:mm A");
+  } catch (error) {
+    return "No time";
+  }
 };
 
 export const formatForChart = (dateInput) => {
@@ -119,19 +155,16 @@ export const isSameDay = (date1, date2) => {
   }
 };
 
-// NEW: Check if date has time component
 export const hasTimeComponent = (dateInput) => {
   try {
     if (!dateInput) return false;
 
     const dateStr = String(dateInput);
 
-    // If it's an ISO string with time, it has time component
     if (dateStr.includes("T") && dateStr.includes(":")) {
       return true;
     }
 
-    // Check for other time patterns
     const timePatterns = [
       /\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?/i,
       /\s+\d{1,2}:\d{2}(:\d{2})?/,
