@@ -6,29 +6,57 @@ export const addIncome = async (req, res) => {
     if (!title || !amount || !date || !category || !description) {
       return res.json({ success: false, message: "All fields are required" });
     }
-    const userDate = new Date(date);
+
+    // Parse the date
+    const incomeDate = new Date(date);
+
+    // Get date parts (local timezone)
+    const year = incomeDate.getFullYear();
+    const month = incomeDate.getMonth();
+    const day = incomeDate.getDate();
+
+    // Create with current time
     const now = new Date();
-    userDate.setHours(
+    const finalDate = new Date(
+      year,
+      month,
+      day,
       now.getHours(),
       now.getMinutes(),
       now.getSeconds(),
       now.getMilliseconds()
     );
+
+    // Convert to UTC
+    const utcDate = new Date(
+      Date.UTC(
+        finalDate.getFullYear(),
+        finalDate.getMonth(),
+        finalDate.getDate(),
+        finalDate.getHours(),
+        finalDate.getMinutes(),
+        finalDate.getSeconds()
+      )
+    );
+
     const income = new incomeModel({
       user: req.user.id,
       title,
       amount,
-      date: userDate,
+      date: utcDate,
       category,
       description,
       type: "income",
     });
+
     await income.save();
-    res.json({ success: true, message: "Income added successfully" });
+    res.json({ success: true, message: "Income added successfully", income });
   } catch (error) {
+    console.error("Add Income Error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
+
 export const getIncomes = async (req, res) => {
   try {
     const incomes = await incomeModel

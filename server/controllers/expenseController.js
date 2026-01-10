@@ -16,27 +16,50 @@ export const addExpense = async (req, res) => {
       });
     }
 
+    // Parse the date string into a Date object
     const expenseDate = new Date(date);
+
+    // Get the date-only parts (local timezone)
+    const year = expenseDate.getFullYear();
+    const month = expenseDate.getMonth();
+    const day = expenseDate.getDate();
+
+    // Create a date with current time in local timezone
     const now = new Date();
-    expenseDate.setHours(
+    const finalDate = new Date(
+      year,
+      month,
+      day,
       now.getHours(),
       now.getMinutes(),
       now.getSeconds(),
       now.getMilliseconds()
     );
 
-    const month = expenseDate.toLocaleString("default", { month: "long" });
-    const year = expenseDate.getFullYear().toString();
+    // Convert to UTC for storage
+    const utcDate = new Date(
+      Date.UTC(
+        finalDate.getFullYear(),
+        finalDate.getMonth(),
+        finalDate.getDate(),
+        finalDate.getHours(),
+        finalDate.getMinutes(),
+        finalDate.getSeconds()
+      )
+    );
+
+    const monthName = utcDate.toLocaleString("default", { month: "long" });
+    const yearStr = utcDate.getUTCFullYear().toString();
 
     const newExpense = new expenseModel({
       user: userId,
       title,
       amount,
-      date: expenseDate,
+      date: utcDate, // Store as UTC
       category,
       description,
-      month,
-      year,
+      month: monthName.toLowerCase(), // Store as lowercase for consistency
+      year: yearStr,
       periodType: "monthly",
       type: "expense",
     });
@@ -48,7 +71,7 @@ export const addExpense = async (req, res) => {
     const categoryBudget = await Budget.findOne({
       user: userId,
       periodType: "monthly",
-      month: month.toLowerCase(),
+      month: monthName.toLowerCase(), // Use lowercase here too
       category: category.toLowerCase(),
     });
 
@@ -57,7 +80,7 @@ export const addExpense = async (req, res) => {
         {
           $match: {
             user: userId,
-            month: month.toLowerCase(),
+            month: monthName.toLowerCase(), // Use lowercase here
             category: category.toLowerCase(),
           },
         },
@@ -71,36 +94,40 @@ export const addExpense = async (req, res) => {
         await Notification.create({
           userId,
           title: "Budget Exceeded!",
-          message: `You have exceeded your ${category} budget for ${month}. Total spent: ₦${totalSpent} of ₦${categoryBudget.amount} budget.`,
+          message: `You have exceeded your ${category} budget for ${monthName}. Total spent: ₦${totalSpent} of ₦${categoryBudget.amount} budget.`,
           type: "warning",
         });
 
-        await sendTemplatedEmail("budgetAlert", user.email, {
-          firstName: user.firstName || "User",
-          category,
-          month,
-          remaining,
-          totalSpent,
-          budgetAmount: categoryBudget.amount,
-          type: "exceeded",
-        });
+        if (user && user.email) {
+          await sendTemplatedEmail("budgetAlert", user.email, {
+            firstName: user.firstName || "User",
+            category,
+            month: monthName,
+            remaining,
+            totalSpent,
+            budgetAmount: categoryBudget.amount,
+            type: "exceeded",
+          });
+        }
       } else if (remaining <= categoryBudget.amount * 0.2) {
         await Notification.create({
           userId,
           title: "Budget Alert",
-          message: `Only ₦${remaining} remaining for your ${category} budget in ${month}.`,
+          message: `Only ₦${remaining} remaining for your ${category} budget in ${monthName}.`,
           type: "info",
         });
 
-        await sendTemplatedEmail("budgetAlert", user.email, {
-          firstName: user.firstName || "User",
-          category,
-          month,
-          remaining,
-          totalSpent,
-          budgetAmount: categoryBudget.amount,
-          type: "warning",
-        });
+        if (user && user.email) {
+          await sendTemplatedEmail("budgetAlert", user.email, {
+            firstName: user.firstName || "User",
+            category,
+            month: monthName,
+            remaining,
+            totalSpent,
+            budgetAmount: categoryBudget.amount,
+            type: "warning",
+          });
+        }
       }
     }
 
@@ -111,6 +138,7 @@ export const addExpense = async (req, res) => {
     });
   } catch (error) {
     console.error("Add Expense Error:", error.message);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
       success: false,
       message: "Server error while adding expense",
