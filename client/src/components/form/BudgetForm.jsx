@@ -1,6 +1,5 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
-import { AppContent } from "../../context/AppContext";
 import { toast } from "react-toastify";
 
 const FormContainer = styled.div`
@@ -82,9 +81,10 @@ const Button = styled.button`
   }
 `;
 
-const BudgetForm = ({ onBudgetSaved }) => {
-  const { addBudget } = useContext(AppContent);
-
+const BudgetForm = ({
+  onBudgetSaved = { handleFormSubmit },
+  isSubmitting = { isAddingBudget },
+}) => {
   const [month, setMonth] = useState("");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -110,6 +110,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!month || !title || !category || !amount) {
       toast.error("Please fill all fields.");
       return;
@@ -117,18 +118,14 @@ const BudgetForm = ({ onBudgetSaved }) => {
 
     setLoading(true);
     try {
-      await addBudget({ month, title, category, amount });
+      await onBudgetSaved({ month, title, category, amount });
 
       setMonth("");
       setTitle("");
       setCategory("");
       setAmount("");
-
-      if (onBudgetSaved) {
-        onBudgetSaved();
-      }
     } catch (error) {
-      toast.error("Failed to save budget. Please try again.");
+      toast.error(error.message || "Failed to save budget. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { AppContent } from "../context/AppContext";
 import BudgetForm from "./form/BudgetForm";
 import BudgetItem from "../incomeItem/BudgetItem";
-import { naira } from "../utils/icon";
 import BudgetProgress from "./BudgetProgress";
 
 const BudgetStyled = styled.div`
@@ -465,10 +464,12 @@ const BudgetStyled = styled.div`
 `;
 
 const Budget = () => {
-  const { budgets, getBudgets, deleteBudget } = useContext(AppContent);
+  const { budgets, getBudgets, deleteBudget, addBudget } =
+    useContext(AppContent);
   const [filter, setFilter] = useState("all");
   const [showFormOverlay, setShowFormOverlay] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isAddingBudget, setIsAddingBudget] = useState(false);
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -501,14 +502,37 @@ const Budget = () => {
       await getBudgets();
     } catch (error) {
       console.error("Error refreshing budgets:", error);
+      setFormError("Failed to refresh budgets. Please try again.");
     } finally {
       setIsRefreshing(false);
     }
   };
 
-  const handleFormSubmit = () => {
-    setShowFormOverlay(false);
-    refreshBudgets();
+  const handleFormSubmit = async (budgetData) => {
+    setIsAddingBudget(true);
+    setFormError(null);
+
+    try {
+      // Call addBudget with the data
+      await addBudget(budgetData);
+
+      // Wait a bit to ensure backend processed the request
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Refresh budgets
+      await refreshBudgets();
+
+      // Close form only after successful addition
+      setShowFormOverlay(false);
+
+      // Show success message if needed
+      toast.success("Budget added successfully!");
+    } catch (error) {
+      console.error("Error adding budget:", error);
+      setFormError(error.message || "Failed to add budget. Please try again.");
+    } finally {
+      setIsAddingBudget(false);
+    }
   };
 
   const handleFilterChange = (e) => {
@@ -516,14 +540,45 @@ const Budget = () => {
   };
 
   const handleOverlayClick = (e) => {
-    if (e.target.className === "form-overlay") {
+    if (e.target.className === "form-overlay" && !isAddingBudget) {
       setShowFormOverlay(false);
     }
+  };
+
+  const handleManualRefresh = async () => {
+    await refreshBudgets();
   };
 
   return (
     <BudgetStyled>
       <h1>Monthly Budgets {isRefreshing && "🔄"}</h1>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "1rem",
+          gap: "1rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          onClick={handleManualRefresh}
+          disabled={isRefreshing}
+          style={{
+            padding: "0.5rem 1rem",
+            background: "#3498db",
+            color: "white",
+            border: "none",
+            borderRadius: "20px",
+            cursor: isRefreshing ? "not-allowed" : "pointer",
+            opacity: isRefreshing ? 0.7 : 1,
+            fontSize: "0.9rem",
+          }}
+        >
+          {isRefreshing ? "Refreshing..." : "Refresh Budgets"}
+        </button>
+      </div>
 
       <div className="total-budget">
         <span>Total Budget:</span>
@@ -534,12 +589,17 @@ const Budget = () => {
         <button
           className="desktop-add-btn"
           onClick={() => setShowFormOverlay(true)}
+          disabled={isAddingBudget}
         >
-          Set Budget
+          {isAddingBudget ? "Adding..." : "Set Budget"}
         </button>
 
         <div className="filter-select">
-          <select value={filter} onChange={handleFilterChange}>
+          <select
+            value={filter}
+            onChange={handleFilterChange}
+            disabled={isRefreshing}
+          >
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>
                 {cat.label}
@@ -554,10 +614,18 @@ const Budget = () => {
         className="mobile-add-btn"
         onClick={() => setShowFormOverlay(true)}
         title="Set New Budget"
+        disabled={isAddingBudget}
+        style={isAddingBudget ? { opacity: 0.7, cursor: "not-allowed" } : {}}
       >
-        Set
-        <br />
-        Budget
+        {isAddingBudget ? (
+          "Adding..."
+        ) : (
+          <>
+            Set
+            <br />
+            Budget
+          </>
+        )}
       </button>
 
       {showFormOverlay && (
@@ -565,12 +633,60 @@ const Budget = () => {
           <div className="form-container">
             <button
               className="close-btn"
-              onClick={() => setShowFormOverlay(false)}
+              onClick={() => !isAddingBudget && setShowFormOverlay(false)}
               aria-label="Close form"
+              disabled={isAddingBudget}
+              style={
+                isAddingBudget ? { cursor: "not-allowed", opacity: 0.5 } : {}
+              }
             >
               ×
             </button>
-            <BudgetForm onBudgetSaved={handleFormSubmit} />
+
+            {isAddingBudget && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(255,255,255,0.8)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 10,
+                  borderRadius: "20px",
+                }}
+              >
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+                    ⏳
+                  </div>
+                  <div>Adding budget...</div>
+                </div>
+              </div>
+            )}
+
+            {/* {formError && (
+              <div
+                style={{
+                  background: "#ffebee",
+                  color: "#c62828",
+                  padding: "0.75rem",
+                  borderRadius: "8px",
+                  marginBottom: "1rem",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {formError}
+              </div>
+            )} */}
+
+            <BudgetForm
+              onBudgetSaved={handleFormSubmit}
+              isSubmitting={isAddingBudget}
+            />
           </div>
         </div>
       )}
@@ -583,6 +699,22 @@ const Budget = () => {
             Refreshing budgets...
           </div>
         )}
+
+        {isAddingBudget && !isRefreshing && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "2rem",
+              color: "#1abc9c",
+              background: "#f8f9fa",
+              borderRadius: "12px",
+              margin: "1rem 0",
+            }}
+          >
+            Adding new budget...
+          </div>
+        )}
+
         <div className="budget-list">
           {filteredBudgets.length === 0 ? (
             <p className="empty-message">

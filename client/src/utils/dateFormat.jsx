@@ -1,95 +1,3 @@
-// import moment from "moment";
-
-// export const dateFormat = (dateInput) => {
-//   try {
-//     if (!dateInput) {
-//       return "N/A";
-//     }
-
-//     // Parse the date - if it's stored as UTC in DB, moment will handle it correctly
-//     const m = moment(dateInput);
-
-//     if (!m.isValid()) {
-//       return "Invalid Date";
-//     }
-
-//     // Display in local timezone
-//     return m.local().format("DD/MM/YYYY");
-//   } catch (error) {
-//     console.error("dateFormat error:", error);
-//     return "Error";
-//   }
-// };
-
-// export const timeFormat = (dateInput) => {
-//   try {
-//     if (!dateInput) return "No time";
-
-//     const m = moment(dateInput);
-
-//     if (!m.isValid()) return "No time";
-
-//     // Check if time is midnight (00:00)
-//     const localTime = m.local();
-//     if (
-//       localTime.hour() === 0 &&
-//       localTime.minute() === 0 &&
-//       localTime.second() === 0
-//     ) {
-//       return "No time";
-//     }
-
-//     return localTime.format("hh:mm A");
-//   } catch (error) {
-//     console.error("timeFormat error:", error);
-//     return "No time";
-//   }
-// };
-
-// export const formatDateOnly = (dateInput) => {
-//   try {
-//     if (!dateInput) return "N/A";
-
-//     const m = moment(dateInput);
-//     if (!m.isValid()) return "Invalid Date";
-
-//     return m.local().format("DD/MM/YYYY");
-//   } catch (error) {
-//     console.error("formatDateOnly error:", error);
-//     return "Error";
-//   }
-// };
-
-// export const formatTimeOnly = (dateInput) => {
-//   try {
-//     if (!dateInput) return "No time";
-
-//     const m = moment(dateInput);
-//     if (!m.isValid()) return "No time";
-
-//     const localTime = m.local();
-//     return localTime.format("hh:mm A");
-//   } catch (error) {
-//     console.error("formatTimeOnly error:", error);
-//     return "No time";
-//   }
-// };
-
-// export const formatForChart = (dateInput) => {
-//   try {
-//     const formatted = dateFormat(dateInput);
-//     if (formatted === "Invalid Date" || formatted === "Error") {
-//       return "N/A";
-//     }
-//     return formatted;
-//   } catch (error) {
-//     console.error("formatForChart error:", error);
-//     return "N/A";
-//   }
-// };
-
-// dateFormat.jsx - UPDATED VERSION
-
 import moment from "moment";
 
 export const dateFormat = (dateInput) => {
@@ -98,7 +6,6 @@ export const dateFormat = (dateInput) => {
       return "N/A";
     }
 
-    // If it's already in YYYY-MM-DD format (from backend), parse it directly
     if (
       typeof dateInput === "string" &&
       /^\d{4}-\d{2}-\d{2}$/.test(dateInput)
@@ -109,8 +16,6 @@ export const dateFormat = (dateInput) => {
         "0"
       )}/${year}`;
     }
-
-    // For other formats, use moment
     const m = moment(dateInput);
 
     if (!m.isValid()) {
@@ -128,12 +33,23 @@ export const timeFormat = (dateInput) => {
   try {
     if (!dateInput) return "No time";
 
-    // For dates from backend (YYYY-MM-DD), always return "No time"
     if (
       typeof dateInput === "string" &&
       /^\d{4}-\d{2}-\d{2}$/.test(dateInput)
     ) {
       return "No time";
+    }
+
+    if (typeof dateInput === "string" && dateInput.includes("T")) {
+      const m = moment(dateInput);
+      if (!m.isValid()) return "No time";
+
+      const timePart = dateInput.split("T")[1];
+      if (timePart.startsWith("00:00:00")) {
+        return "No time";
+      }
+
+      return m.format("hh:mm A");
     }
 
     const m = moment(dateInput);
@@ -142,7 +58,6 @@ export const timeFormat = (dateInput) => {
       return "No time";
     }
 
-    // Check if time is midnight (00:00)
     if (m.hour() === 0 && m.minute() === 0 && m.second() === 0) {
       return "No time";
     }
@@ -211,7 +126,7 @@ export const formatForBackend = (dateObject) => {
   try {
     if (!dateObject) return "";
 
-    const date = new Date(dateObject);
+    const date = dateObject instanceof Date ? dateObject : new Date(dateObject);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
@@ -223,22 +138,30 @@ export const formatForBackend = (dateObject) => {
   }
 };
 
-// FIXED VERSION of formatForBackend:
-// export const formatForBackend = (dateObject) => {
-//   try {
-//     if (!dateObject) return "";
+// NEW: Helper to check if a date has time information
+export const hasTimeInfo = (dateInput) => {
+  try {
+    if (!dateInput) return false;
 
-//     // If it's already a Date object
-//     const date = dateObject instanceof Date ? dateObject : new Date(dateObject);
+    if (typeof dateInput === "string") {
+      // Check if it's a full ISO string with time
+      if (dateInput.includes("T")) {
+        const timePart = dateInput.split("T")[1];
+        return !timePart.startsWith("00:00:00");
+      }
+      // If it's just YYYY-MM-DD, no time
+      return false;
+    }
 
-//     // Get local date components (NOT UTC!)
-//     const year = date.getFullYear();
-//     const month = String(date.getMonth() + 1).padStart(2, "0");
-//     const day = String(date.getDate()).padStart(2, "0");
-
-//     return `${year}-${month}-${day}`;
-//   } catch (error) {
-//     console.error("formatForBackend error:", error);
-//     return "";
-//   }
-// };
+    // For Date objects
+    const date = new Date(dateInput);
+    return !(
+      date.getHours() === 0 &&
+      date.getMinutes() === 0 &&
+      date.getSeconds() === 0
+    );
+  } catch (error) {
+    console.error("hasTimeInfo error:", error);
+    return false;
+  }
+};
