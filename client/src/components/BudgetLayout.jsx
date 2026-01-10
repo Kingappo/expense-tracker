@@ -4,6 +4,7 @@ import { AppContent } from "../context/AppContext";
 import BudgetForm from "./form/BudgetForm";
 import BudgetItem from "../incomeItem/BudgetItem";
 import BudgetProgress from "./BudgetProgress";
+import { toast } from "react-toastify";
 
 const BudgetStyled = styled.div`
   h1 {
@@ -502,7 +503,6 @@ const Budget = () => {
       await getBudgets();
     } catch (error) {
       console.error("Error refreshing budgets:", error);
-      setFormError("Failed to refresh budgets. Please try again.");
     } finally {
       setIsRefreshing(false);
     }
@@ -510,26 +510,18 @@ const Budget = () => {
 
   const handleFormSubmit = async (budgetData) => {
     setIsAddingBudget(true);
-    setFormError(null);
 
     try {
-      // Call addBudget with the data
       await addBudget(budgetData);
 
-      // Wait a bit to ensure backend processed the request
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Refresh budgets
       await refreshBudgets();
 
-      // Close form only after successful addition
       setShowFormOverlay(false);
-
-      // Show success message if needed
-      toast.success("Budget added successfully!");
     } catch (error) {
       console.error("Error adding budget:", error);
-      setFormError(error.message || "Failed to add budget. Please try again.");
+      toast.error("Failed to add budget. Please try again.");
     } finally {
       setIsAddingBudget(false);
     }
@@ -667,21 +659,6 @@ const Budget = () => {
                 </div>
               </div>
             )}
-
-            {/* {formError && (
-              <div
-                style={{
-                  background: "#ffebee",
-                  color: "#c62828",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  marginBottom: "1rem",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {formError}
-              </div>
-            )} */}
 
             <BudgetForm
               onBudgetSaved={handleFormSubmit}

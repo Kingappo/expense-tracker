@@ -81,10 +81,7 @@ const Button = styled.button`
   }
 `;
 
-const BudgetForm = ({
-  onBudgetSaved = { handleFormSubmit },
-  isSubmitting = { isAddingBudget },
-}) => {
+const BudgetForm = ({ onBudgetSaved, isSubmitting }) => {
   const [month, setMonth] = useState("");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -154,19 +151,6 @@ const BudgetForm = ({
           </Select>
         </FormGroup>
 
-        {/* Title */}
-        <FormGroup>
-          <Label>Budget Title</Label>
-          <Input
-            type="text"
-            placeholder="e.g. Food Budget"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </FormGroup>
-
         {/* select */}
         <FormGroup>
           <Label>Select Category</Label>
@@ -187,6 +171,19 @@ const BudgetForm = ({
             <option value="school">School</option>
             <option value="others">Others</option>
           </Select>
+        </FormGroup>
+
+        {/* Title */}
+        <FormGroup>
+          <Label>Budget Title</Label>
+          <Input
+            type="text"
+            placeholder="e.g. Food Budget"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            disabled={loading}
+          />
         </FormGroup>
 
         {/* Amount */}
