@@ -339,7 +339,7 @@ const BudgetItem = ({
         return gift;
       case "school":
         return school;
-      case "other":
+      case "others":
         return piggy;
       default:
         return piggy;

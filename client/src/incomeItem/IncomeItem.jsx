@@ -346,7 +346,7 @@ const IncomeItem = ({
         return gift;
       case "shopping":
         return shopping;
-      case "other":
+      case "others":
         return piggy;
       default:
         return piggy;

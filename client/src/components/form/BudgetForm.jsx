@@ -188,7 +188,7 @@ const BudgetForm = ({ onBudgetSaved }) => {
             <option value="data">Data</option>
             <option value="gift">Gift</option>
             <option value="school">School</option>
-            <option value="other">Others</option>
+            <option value="others">Others</option>
           </Select>
         </FormGroup>
 

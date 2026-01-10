@@ -258,7 +258,6 @@ function ReportItem() {
   const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-  // Helper function to determine if a transaction is income
   const isIncome = (transaction) => {
     return (
       incomes.some((inc) => inc._id === transaction._id) ||
@@ -355,23 +354,27 @@ function ReportItem() {
                       "Rent",
                       "Gift",
                       "School",
-                      "Other",
-                    ].map((cat) => {
-                      const spent = expenses
-                        .filter(
-                          (e) => e.category.toLowerCase() === cat.toLowerCase()
-                        )
-                        .reduce((sum, e) => sum + e.amount, 0);
+                      "Others",
+                    ]
+                      .map((cat) => {
+                        const spent = expenses
+                          .filter(
+                            (e) =>
+                              e.category.toLowerCase() === cat.toLowerCase()
+                          )
+                          .reduce((sum, e) => sum + e.amount, 0);
 
-                      return (
-                        <tr key={cat}>
-                          <td>{cat}</td>
+                        return { category: cat, amount: spent };
+                      })
+                      .sort((a, b) => b.amount - a.amount)
+                      .map(({ category, amount }) => (
+                        <tr key={category}>
+                          <td>{category}</td>
                           <td style={{ color: "red" }}>
-                            {spent.toLocaleString()}
+                            {amount.toLocaleString()}
                           </td>
                         </tr>
-                      );
-                    })}
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -431,7 +434,7 @@ function ReportItem() {
                       <th>Date</th>
                       <th>Type</th>
                       <th>Category</th>
-                      <th>Description</th>
+                      <th>Title</th>
                       <th style={{ textAlign: "left" }}>Amount (NGN) </th>
                     </tr>
                   </thead>
@@ -459,7 +462,7 @@ function ReportItem() {
                               {income ? "Income" : "Expense"}
                             </td>
                             <td>{t.category}</td>
-                            <td>{t.description}</td>
+                            <td>{t.title}</td>
                             <td
                               style={{
                                 color: transactionColor,

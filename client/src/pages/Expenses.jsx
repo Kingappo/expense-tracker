@@ -477,7 +477,7 @@ const Expenses = () => {
     { value: "data", label: "Data" },
     { value: "gift", label: "Gift" },
     { value: "school", label: "School" },
-    { value: "other", label: "Other" },
+    { value: "others", label: "Others" },
   ];
 
   const filteredExpenses =

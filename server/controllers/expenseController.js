@@ -16,23 +16,6 @@ export const addExpense = async (req, res) => {
       });
     }
 
-    // const expenseDate = new Date(date);
-    // const month = expenseDate.toLocaleString("default", { month: "long" });
-    // const year = expenseDate.getFullYear().toString();
-
-    // const newExpense = new expenseModel({
-    //   user: userId,
-    //   title,
-    //   amount,
-    //   date,
-    //   category,
-    //   description,
-    //   month,
-    //   year,
-    //   periodType: "monthly",
-    //   type: "expense",
-    // });
-
     const expenseDate = new Date(date);
     const now = new Date();
     expenseDate.setHours(
@@ -49,7 +32,7 @@ export const addExpense = async (req, res) => {
       user: userId,
       title,
       amount,
-      date: expenseDate, // Use the date with time
+      date: expenseDate,
       category,
       description,
       month,
@@ -57,9 +40,9 @@ export const addExpense = async (req, res) => {
       periodType: "monthly",
       type: "expense",
     });
-    // await newExpense.save();
 
     await newExpense.save();
+
     const user = await userModel.findById(userId).select("email firstName");
 
     const categoryBudget = await Budget.findOne({
@@ -139,9 +122,11 @@ export const addExpense = async (req, res) => {
 export const getExpenses = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    // Sort by date in descending order (most recent first)
     const expenses = await expenseModel
       .find({ user: userId })
-      .sort({ createdAt: -1 });
+      .sort({ date: -1, createdAt: -1 }); // First by date, then by creation time
 
     res.json({
       success: true,
@@ -160,11 +145,32 @@ export const updateExpense = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
-    const updatedData = req.body;
+    const { title, amount, date, category, description } = req.body;
+
+    // If date is being updated, we need to recalculate month/year
+    let updateData = { title, amount, category, description };
+
+    if (date) {
+      const expenseDate = new Date(date);
+      const now = new Date();
+      expenseDate.setHours(
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+        now.getMilliseconds()
+      );
+
+      const month = expenseDate.toLocaleString("default", { month: "long" });
+      const year = expenseDate.getFullYear().toString();
+
+      updateData.date = expenseDate;
+      updateData.month = month;
+      updateData.year = year;
+    }
 
     const updatedExpense = await expenseModel.findOneAndUpdate(
       { _id: id, user: userId },
-      updatedData,
+      updateData,
       { new: true }
     );
 
