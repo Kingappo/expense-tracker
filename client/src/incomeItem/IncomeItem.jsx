@@ -292,6 +292,127 @@ const IncomeItemStyled = styled.div`
   }
 `;
 
+// const IncomeItem = ({
+//   id,
+//   title,
+//   amount,
+//   date,
+//   category,
+//   description,
+//   type,
+//   deleteItem,
+//   indicatorColor,
+//   showDelete = true,
+//   isMainHistory = false,
+// }) => {
+//   const incomeCategory = () => {
+//     switch (category) {
+//       case "salary":
+//         return money;
+//       case "freelance":
+//         return freelance;
+//       case "investment":
+//         return stocks;
+//       case "farming":
+//         return farming;
+//       case "business":
+//         return business;
+//       case "gift":
+//         return gift;
+//       case "others":
+//         return piggy;
+//       default:
+//         return piggy;
+//     }
+//   };
+
+//   const expenseCategory = () => {
+//     switch (category) {
+//       case "food":
+//         return food;
+//       case "transport":
+//         return transport;
+//       case "health":
+//         return medical;
+//       case "rent":
+//         return rent;
+//       case "school":
+//         return school;
+//       case "airtime":
+//         return airtime;
+//       case "data":
+//         return data;
+//       case "gift":
+//         return gift;
+//       case "shopping":
+//         return shopping;
+//       case "others":
+//         return piggy;
+//       default:
+//         return piggy;
+//     }
+//   };
+
+//   const handleDelete = () => {
+//     Swal.fire({
+//       title: "Are you sure you want to delete this?",
+//       text: "This action cannot be undone.",
+//       icon: "warning",
+//       showCancelButton: true,
+//       confirmButtonColor: "#d33",
+//       cancelButtonColor: "#008000",
+//       confirmButtonText: "Yes, delete",
+//       cancelButtonText: "Cancel",
+//       background: "#fcf6f9",
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         deleteItem(id);
+//         Swal.fire({
+//           title: "Deleted!",
+//           text: "The record has been deleted successfully.",
+//           icon: "success",
+//           timer: 1500,
+//           showConfirmButton: false,
+//         });
+//       }
+//     });
+//   };
+
+//   return (
+//     <IncomeItemStyled indicator={indicatorColor} isMainHistory={isMainHistory}>
+//       <div className="icon">
+//         {type === "expense" ? expenseCategory() : incomeCategory()}
+//       </div>
+
+//       <div className="content">
+//         <h5>{title}</h5>
+//         <div className="inner-content">
+//           <div className="text">
+//             <p>
+//               {naira} {amount}
+//             </p>
+
+//             <p>
+//               {calender} {dateFormat(date)} <span>at {timeFormat(date)} </span>
+//             </p>
+//             <p>
+//               {comment} {description}
+//             </p>
+//           </div>
+
+//           {showDelete && (
+//             <div className="btn-con" onClick={handleDelete}>
+//               {trash}
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </IncomeItemStyled>
+//   );
+// };
+
+// export default IncomeItem;
+
 const IncomeItem = ({
   id,
   title,

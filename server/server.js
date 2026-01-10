@@ -15,8 +15,8 @@ const app = express();
 const PORT = process.env.PORT || 7000;
 connectDB();
 
-// const allowedorigins = ["http://localhost:5173"];
-const allowedorigins = ["https://expense-tracker-uupm.onrender.com"];
+const allowedorigins = ["http://localhost:5173"];
+// const allowedorigins = ["https://expense-tracker-uupm.onrender.com"];
 
 app.use(express.json());
 app.use(cookieParser());

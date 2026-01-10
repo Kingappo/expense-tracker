@@ -1,3 +1,234 @@
+// import axios from "axios";
+// import { createContext, useEffect, useState } from "react";
+// import { toast } from "react-toastify";
+
+// export const AppContent = createContext();
+// export const AppContextProvider = (props) => {
+//   axios.defaults.withCredentials = true;
+//   const backendUrl = "http://localhost:7000";
+//   // const backendUrl = "https://expense-tracker-backend-valo.onrender.com";
+//   const [isLoggedin, setIsLoggedin] = useState(false);
+//   const [userData, setUserData] = useState(null);
+//   const [incomes, setIncomes] = useState([]);
+//   const [expenses, setExpenses] = useState([]);
+//   const [budgets, setBudgets] = useState([]);
+
+//   const getAuthState = async () => {
+//     try {
+//       const { data } = await axios.get(backendUrl + "/api/auth/is-auth");
+//       if (data.success) {
+//         setIsLoggedin(true);
+//         getUserData();
+//       }
+//     } catch (error) {
+//       if (error.response?.status === 401) {
+//         setIsLoggedin(false);
+//         setUserData(null);
+//       } else {
+//         toast.error(error.message);
+//       }
+//     }
+//   };
+//   const getUserData = async () => {
+//     try {
+//       const { data } = await axios.get(backendUrl + "/api/user/get-user");
+//       data.success ? setUserData(data.userData) : toast.error(data.message);
+//     } catch (error) {
+//       toast.error(error.message);
+//     }
+//   };
+
+//   const addIncome = async (income) => {
+//     try {
+//       const { data } = await axios.post(
+//         `${backendUrl}/api/income/add-income`,
+//         income
+//       );
+//       if (data.success) {
+//         toast.success(data.message);
+//         getIncomes();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.message);
+//     }
+//   };
+//   const getIncomes = async () => {
+//     try {
+//       const { data } = await axios.get(`${backendUrl}/api/income/get-incomes`);
+//       if (data.success) {
+//         setIncomes(data.incomes);
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.message);
+//     }
+//   };
+//   const deleteIncome = async (id) => {
+//     try {
+//       const { data } = await axios.delete(
+//         `${backendUrl}/api/income/delete-income/${id}`
+//       );
+//       if (data.success) {
+//         getIncomes();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.message);
+//     }
+//   };
+//   const addExpense = async (expense) => {
+//     try {
+//       const { data } = await axios.post(
+//         `${backendUrl}/api/expense/add-expense`,
+//         expense
+//       );
+//       if (data.success) {
+//         toast.success(data.message);
+//         getExpenses();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const getExpenses = async () => {
+//     try {
+//       const { data } = await axios.get(
+//         `${backendUrl}/api/expense/get-expenses`
+//       );
+//       if (data.success) {
+//         setExpenses(data.expenses);
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const deleteExpense = async (id) => {
+//     try {
+//       const { data } = await axios.delete(
+//         `${backendUrl}/api/expense/delete-expense/${id}`
+//       );
+//       if (data.success) {
+//         toast.success(data.message);
+//         getExpenses();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const getBudgets = async () => {
+//     try {
+//       const { data } = await axios.get(`${backendUrl}/api/budget`);
+//       if (data.success) {
+//         setBudgets(data.budgets);
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const addBudget = async ({ month, title, category, amount }) => {
+//     try {
+//       const { data } = await axios.post(
+//         `${backendUrl}/api/budget/set/${month}`,
+//         { title, category, amount },
+//         { withCredentials: true }
+//       );
+//       if (data.success) {
+//         toast.success(data.message);
+//         getBudgets();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const deleteBudget = async (id) => {
+//     try {
+//       const { data } = await axios.delete(`${backendUrl}/api/budget/${id}`);
+//       if (data.success) {
+//         toast.success(data.message);
+//         getBudgets();
+//       } else {
+//         toast.error(data.message);
+//       }
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || error.message);
+//     }
+//   };
+//   const totalIncome = () => {
+//     let total = 0;
+//     incomes.forEach((income) => {
+//       total += income.amount || 0;
+//     });
+//     return total;
+//   };
+//   const totalExpense = () => {
+//     let total = 0;
+//     expenses.forEach((expense) => {
+//       total += expense.amount || 0;
+//     });
+//     return total;
+//   };
+//   const balance = () => {
+//     return totalIncome() - totalExpense();
+//   };
+//   const transactionHistory = () => {
+//     const history = [...incomes, ...expenses];
+//     history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+//     return history.slice(0, 3);
+//   };
+//   useEffect(() => {
+//     getAuthState();
+//   }, []);
+//   useEffect(() => {
+//     if (isLoggedin) {
+//       getIncomes();
+//       getExpenses();
+//       getBudgets();
+//     }
+//   }, [isLoggedin]);
+//   const value = {
+//     backendUrl,
+//     isLoggedin,
+//     setIsLoggedin,
+//     userData,
+//     setUserData,
+//     getUserData,
+//     addIncome,
+//     incomes,
+//     getIncomes,
+//     deleteIncome,
+//     addExpense,
+//     expenses,
+//     getExpenses,
+//     deleteExpense,
+//     budgets,
+//     getBudgets,
+//     addBudget,
+//     deleteBudget,
+//     totalIncome,
+//     totalExpense,
+//     balance,
+//     transactionHistory,
+//   };
+//   return (
+//     <AppContent.Provider value={value}>{props.children}</AppContent.Provider>
+//   );
+// };
+
+// AppContext.jsx - UPDATED VERSION
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -5,8 +236,8 @@ import { toast } from "react-toastify";
 export const AppContent = createContext();
 export const AppContextProvider = (props) => {
   axios.defaults.withCredentials = true;
-  // const backendUrl = "http://localhost:7000";
-  const backendUrl = "https://expense-tracker-backend-valo.onrender.com";
+  const backendUrl = "http://localhost:7000";
+  // const backendUrl = "https://expense-tracker-backend-valo.onrender.com";
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [userData, setUserData] = useState(null);
   const [incomes, setIncomes] = useState([]);
@@ -29,6 +260,7 @@ export const AppContextProvider = (props) => {
       }
     }
   };
+
   const getUserData = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/user/get-user");
@@ -40,9 +272,15 @@ export const AppContextProvider = (props) => {
 
   const addIncome = async (income) => {
     try {
+      // Ensure amount is a number
+      const incomeData = {
+        ...income,
+        amount: Number(income.amount),
+      };
+
       const { data } = await axios.post(
         `${backendUrl}/api/income/add-income`,
-        income
+        incomeData
       );
       if (data.success) {
         toast.success(data.message);
@@ -51,40 +289,51 @@ export const AppContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const getIncomes = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/income/get-incomes`);
       if (data.success) {
-        setIncomes(data.incomes);
+        // The backend now returns dates in YYYY-MM-DD format
+        setIncomes(data.incomes || []);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const deleteIncome = async (id) => {
     try {
       const { data } = await axios.delete(
         `${backendUrl}/api/income/delete-income/${id}`
       );
       if (data.success) {
+        toast.success(data.message);
         getIncomes();
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const addExpense = async (expense) => {
     try {
+      // Ensure amount is a number
+      const expenseData = {
+        ...expense,
+        amount: Number(expense.amount),
+      };
+
       const { data } = await axios.post(
         `${backendUrl}/api/expense/add-expense`,
-        expense
+        expenseData
       );
       if (data.success) {
         toast.success(data.message);
@@ -96,13 +345,15 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const getExpenses = async () => {
     try {
       const { data } = await axios.get(
         `${backendUrl}/api/expense/get-expenses`
       );
       if (data.success) {
-        setExpenses(data.expenses);
+        // The backend now returns dates in YYYY-MM-DD format
+        setExpenses(data.expenses || []);
       } else {
         toast.error(data.message);
       }
@@ -110,6 +361,7 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const deleteExpense = async (id) => {
     try {
       const { data } = await axios.delete(
@@ -125,11 +377,12 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const getBudgets = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/budget`);
       if (data.success) {
-        setBudgets(data.budgets);
+        setBudgets(data.budgets || []);
       } else {
         toast.error(data.message);
       }
@@ -137,11 +390,16 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const addBudget = async ({ month, title, category, amount }) => {
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/budget/set/${month}`,
-        { title, category, amount },
+        {
+          title,
+          category: category.toLowerCase(),
+          amount: Number(amount),
+        },
         { withCredentials: true }
       );
       if (data.success) {
@@ -154,6 +412,7 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const deleteBudget = async (id) => {
     try {
       const { data } = await axios.delete(`${backendUrl}/api/budget/${id}`);
@@ -167,6 +426,7 @@ export const AppContextProvider = (props) => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
+
   const totalIncome = () => {
     let total = 0;
     incomes.forEach((income) => {
@@ -174,6 +434,7 @@ export const AppContextProvider = (props) => {
     });
     return total;
   };
+
   const totalExpense = () => {
     let total = 0;
     expenses.forEach((expense) => {
@@ -181,17 +442,64 @@ export const AppContextProvider = (props) => {
     });
     return total;
   };
+
   const balance = () => {
     return totalIncome() - totalExpense();
   };
+
   const transactionHistory = () => {
     const history = [...incomes, ...expenses];
-    history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Sort by date properly (handling YYYY-MM-DD format)
+    history.sort((a, b) => {
+      const dateA = new Date(a.date || a.createdAt);
+      const dateB = new Date(b.date || b.createdAt);
+      return dateB - dateA;
+    });
+
     return history.slice(0, 3);
   };
+
+  // Add a function to update income (if you need it)
+  const updateIncome = async (id, updatedData) => {
+    try {
+      const { data } = await axios.put(
+        `${backendUrl}/api/income/update-income/${id}`,
+        updatedData
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getIncomes();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
+  // Add a function to update expense (if you need it)
+  const updateExpense = async (id, updatedData) => {
+    try {
+      const { data } = await axios.put(
+        `${backendUrl}/api/expense/update-expense/${id}`,
+        updatedData
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getExpenses();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
   useEffect(() => {
     getAuthState();
   }, []);
+
   useEffect(() => {
     if (isLoggedin) {
       getIncomes();
@@ -199,6 +507,7 @@ export const AppContextProvider = (props) => {
       getBudgets();
     }
   }, [isLoggedin]);
+
   const value = {
     backendUrl,
     isLoggedin,
@@ -210,10 +519,12 @@ export const AppContextProvider = (props) => {
     incomes,
     getIncomes,
     deleteIncome,
+    updateIncome, // Add this if you need it
     addExpense,
     expenses,
     getExpenses,
     deleteExpense,
+    updateExpense, // Add this if you need it
     budgets,
     getBudgets,
     addBudget,
@@ -223,6 +534,7 @@ export const AppContextProvider = (props) => {
     balance,
     transactionHistory,
   };
+
   return (
     <AppContent.Provider value={value}>{props.children}</AppContent.Provider>
   );
