@@ -505,7 +505,7 @@ function Dashboard() {
               <li onClick={() => handleOptionClick("/expenses")}>
                 Add Expense
               </li>
-              <li onClick={() => handleOptionClick("/budget")}>Add Budget</li>
+              <li onClick={() => handleOptionClick("/budget")}>Set Budget</li>
             </ul>
           </div>
           <button onClick={generateReport} disabled={isDownloading}>

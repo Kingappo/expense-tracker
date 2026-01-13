@@ -475,6 +475,7 @@ const Budget = () => {
   const categories = [
     { value: "all", label: "All Categories" },
     { value: "food", label: "Food" },
+    { value: "shopping", label: "Shopping" },
     { value: "health", label: "Health" },
     { value: "transport", label: "Transport" },
     { value: "rent", label: "Rent" },
@@ -482,7 +483,7 @@ const Budget = () => {
     { value: "data", label: "Data" },
     { value: "gift", label: "Gift" },
     { value: "school", label: "School" },
-    { value: "other", label: "Other" },
+    { value: "others", label: "Others" },
   ];
 
   const filteredBudgets =
@@ -634,31 +635,6 @@ const Budget = () => {
             >
               ×
             </button>
-
-            {isAddingBudget && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: "rgba(255,255,255,0.8)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 10,
-                  borderRadius: "20px",
-                }}
-              >
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-                    ⏳
-                  </div>
-                  <div>Adding budget...</div>
-                </div>
-              </div>
-            )}
 
             <BudgetForm
               onBudgetSaved={handleFormSubmit}

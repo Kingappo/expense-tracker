@@ -162,6 +162,7 @@ const BudgetForm = ({ onBudgetSaved, isSubmitting }) => {
           >
             <option value="">-- Select Category --</option>
             <option value="food">Food</option>
+            <option value="shopping">Shopping</option>
             <option value="health">Health</option>
             <option value="transport">Transport</option>
             <option value="rent">House Rent</option>
